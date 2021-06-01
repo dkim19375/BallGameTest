@@ -1,0 +1,64 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+    id 'org.jetbrains.kotlin.jvm' version '1.5.10'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+}
+
+mainClassName = 'me.dkim19375.ballgametest.BallGameTestKt'
+
+group 'me.dkim19375'
+version '1.0-SNAPSHOT'
+
+final String javafxVersion = '11.0.2'
+
+sourceCompatibility = targetCompatibility = 11
+compileJava.options.encoding = 'UTF-8'
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+}
+
+application {
+    mainClass.set(mainClassName)
+}
+
+javafx {
+    modules = ['javafx.base', 'javafx.controls', 'javafx.graphics', 'javafx.fxml']
+}
+
+def currentOS = DefaultNativePlatform.currentOperatingSystem
+def platform
+if (currentOS.isWindows()) {
+    platform = 'win'
+} else if (currentOS.isLinux()) {
+    platform = 'linux'
+} else if (currentOS.isMacOsX()) {
+    platform = 'mac'
+}
+
+java {
+    modularity.inferModulePath = true
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'commons-io:commons-io:2.8.0'
+    implementation 'io.github.alekseysotnikov:CmdTool:1.0.1'
+    implementation 'org.jetbrains:annotations:+'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.5.0'
+/*    implementation "org.openjfx:javafx-base:$javafxVersion:${platform}"
+    implementation "org.openjfx:javafx-controls:$javafxVersion:${platform}"
+    implementation "org.openjfx:javafx-graphics:$javafxVersion:${platform}"
+    implementation "org.openjfx:javafx-fxml:$javafxVersion:${platform}"*/
+    implementation 'no.tornado:tornadofx:1.7.20'
+}
