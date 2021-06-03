@@ -2,3 +2,6 @@
 /.gradle/
 /build/
 /.idea
+
+# Used for testing stuff
+/src/main/resources/test.fxml
