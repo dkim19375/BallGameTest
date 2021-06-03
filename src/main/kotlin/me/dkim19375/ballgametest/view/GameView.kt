@@ -63,7 +63,7 @@ class GameView : View("Ball Game") {
             }
         }
         SCOPE.launch {
-            delay(2999L)
+            delay(3000L)
             gameStarted = true
             while (active) {
                 val off = measureTimeMillis {
