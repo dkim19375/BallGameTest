@@ -12,13 +12,16 @@ import javafx.scene.text.Font
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.dkim19375.ballgametest.SCOPE
+import me.dkim19375.ballgametest.main
 import me.dkim19375.ballgametest.util.*
 import tornadofx.View
 import tornadofx.circle
 import tornadofx.hbox
+import tornadofx.hide
 import tornadofx.keyboard
 import tornadofx.label
 import tornadofx.pane
+import tornadofx.show
 import kotlin.system.measureTimeMillis
 
 private const val TPS = 500.0
@@ -27,8 +30,7 @@ private val tickDiff: Double
 
 @Suppress("MemberVisibilityCanBePrivate")
 class GameView : View("Ball Game") {
-    lateinit var pane: Pane
-        private set
+    override val root: Pane = pane { start() }
     lateinit var user: Circle
         private set
     lateinit var enemy: Circle
@@ -37,35 +39,67 @@ class GameView : View("Ball Game") {
         private set
     lateinit var scoreLabel: Label
         private set
+    lateinit var livesLabel: Label
+        private set
     lateinit var mainLabel: Label
+        private set
+    lateinit var gameOverLabel: Label
         private set
     var active = false
     var gameStarted = false
     var pressed = mutableSetOf<KeyType>()
     var speed = 0.7
-    var score = 0
+    var lives = 5
+    var enemyFrozen = false
 
-    override val root = pane {
+    init {
+        main.gameView = this
+    }
+
+    private fun reset() {
+        active = false
+        gameStarted = false
+        pressed = mutableSetOf()
+        speed = 0.7
+        main.score = 0
+        lives = 5
+        enemyFrozen = false
+        if (this::gameOverLabel.isInitialized) {
+            gameOverLabel.hide()
+        }
+    }
+
+    fun startWithPaneParam(pane: Pane) = pane.start()
+
+    fun Pane.start() {
+        reset()
         active = true
-        println("active")
-        pane = this
         setupUserBall()
         setupEnemyBall()
         setupVariables()
         SCOPE.launch {
-            while (active) {
-                if (gameStarted) {
-                    speed += 0.05
-                    score++
-                    Platform.runLater { scoreLabel.text = "Score: $score" }
+            var first = true
+            while (true) {
+                if (!active) {
+                    continue
                 }
+                if (gameStarted && !first) {
+                    speed += 0.05
+                    main.score++
+                }
+                Platform.runLater { scoreLabel.text = "Score: ${main.score}" }
+                Platform.runLater { livesLabel.text = "Lives: $lives" }
+                first = false
                 delay(1000L)
             }
         }
         SCOPE.launch {
             delay(3000L)
             gameStarted = true
-            while (active) {
+            while (true) {
+                if (!active) {
+                    continue
+                }
                 val off = measureTimeMillis {
                     move()
                     detectHit()
@@ -92,6 +126,10 @@ class GameView : View("Ball Game") {
     }
 
     private fun Pane.setupUserBall() {
+        if (this@GameView::user.isInitialized) {
+            user.teleport((-200).getX(), 0.getY())
+            return
+        }
         user = circle(centerX = (-200).getX(), centerY = 0.getY(), radius = 50)
         keyboard {
             addEventHandler(KeyEvent.KEY_PRESSED) { event ->
@@ -105,6 +143,10 @@ class GameView : View("Ball Game") {
 
     private fun Pane.setupVariables() {
         var finished = false
+        if (this@GameView::topHBox.isInitialized) {
+            gameOverLabel.hide()
+            return
+        }
         topHBox = hbox {
             alignment = Pos.CENTER
             SCOPE.launch {
@@ -115,8 +157,21 @@ class GameView : View("Ball Game") {
                 }
             }
         }
-        scoreLabel = topHBox.label("Score: 0") { font = Font.font("System", 50.0) }
-        topHBox.label("                  ") { font = Font.font("System", 70.0) }
+        gameOverLabel = label("Game Over!") {
+            font = Font.font("System", 70.0)
+            alignment = Pos.CENTER
+            hide()
+            SCOPE.launch {
+                await { finished }
+                while (true) {
+                    teleport(centerX - (width / 2), windowY - height - 100.0)
+                    delay(50L)
+                }
+            }
+        }
+        scoreLabel = topHBox.label("Score: ${main.score}") { font = Font.font("System", 50.0) }
+        topHBox.label("                   ") { font = Font.font("System", 70.0) }
+        livesLabel = topHBox.label("Lives: $lives") { font = Font.font("System", 50.0) }
         mainLabel = label("Tag") { font = Font.font("System", 70.0) }
         finished = true
     }
@@ -127,6 +182,10 @@ class GameView : View("Ball Game") {
     }
 
     private fun Pane.setupEnemyBall() {
+        if (this@GameView::enemy.isInitialized) {
+            enemy.teleport(200.getX(), 0.getY())
+            return
+        }
         enemy = circle(centerX = 200.getX(), centerY = 0.getY(), radius = 50) {
             fill = Color.RED
             stroke = Color.BLACK
@@ -153,14 +212,34 @@ class GameView : View("Ball Game") {
                 )
             )
         }
-        val enemyLoc = enemy.getLocation()
-        enemy.teleport(enemyLoc.getDirectionPoint(speed * 0.94, enemyLoc.getAngle(user.getLocation())))
+        if (!enemyFrozen) {
+            val enemyLoc = enemy.getLocation()
+            enemy.teleport(enemyLoc.getDirectionPoint(speed * 0.97, enemyLoc.getAngle(user.getLocation())))
+        }
     }
 
     private fun detectHit() {
-        if (user.isTouching(enemy)) {
-            println("touching")
+        if (enemyFrozen) {
+            return
+        }
+        if (!user.isTouching(enemy)) {
+            return
+        }
+        if (lives <= 1) {
             active = false
+            SCOPE.launch {
+                gameOverLabel.show()
+                delay(3000L)
+                Platform.runLater { replaceWith<GameEndView>() }
+            }
+            return
+        }
+        lives--
+        Platform.runLater { livesLabel.text = "Lives: $lives" }
+        SCOPE.launch {
+            enemyFrozen = true
+            delay(3000L)
+            enemyFrozen = false
         }
     }
 }

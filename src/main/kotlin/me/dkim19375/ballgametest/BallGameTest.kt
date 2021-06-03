@@ -19,6 +19,8 @@ fun main(args: Array<String>) {
 class BallGameTest : App(GameView::class) {
     lateinit var stage: Stage
         private set
+    lateinit var gameView: GameView
+    var score = 0
 
     init {
         main = this

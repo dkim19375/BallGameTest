@@ -90,4 +90,6 @@ fun Node.getPoint(direction: KeyType, amount: Double): Point2D {
 
 fun Node.teleport(loc: Point2D) = teleport(loc.x, loc.y)
 
+fun Node.teleport(x: Int, y: Int) = teleport(x.toDouble(), y.toDouble())
+
 fun Node.teleport(x: Double, y: Double) = relocate(x, y)
