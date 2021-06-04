@@ -1,4 +1,4 @@
-package me.dkim19375.ballgametest.view
+package me.dkim19375.tag.view
 
 import javafx.application.Platform
 import javafx.geometry.Pos
@@ -11,17 +11,10 @@ import javafx.scene.shape.Circle
 import javafx.scene.text.Font
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import me.dkim19375.ballgametest.SCOPE
-import me.dkim19375.ballgametest.main
-import me.dkim19375.ballgametest.util.*
-import tornadofx.View
-import tornadofx.circle
-import tornadofx.hbox
-import tornadofx.hide
-import tornadofx.keyboard
-import tornadofx.label
-import tornadofx.pane
-import tornadofx.show
+import me.dkim19375.tag.SCOPE
+import me.dkim19375.tag.main
+import me.dkim19375.tag.util.*
+import tornadofx.*
 import kotlin.system.measureTimeMillis
 
 private const val TPS = 500.0
@@ -104,11 +97,10 @@ class GameView : View("Ball Game") {
                     move()
                     detectHit()
                 }
-                if (off > tickDiff) {
+                if ((off > tickDiff) && ((off - tickDiff) / tickDiff >= 1.0)) {
                     System.err.println("Running ${(off - tickDiff).toInt()}ms behind (${((off - tickDiff) / tickDiff).toInt()} ticks)!")
-                    continue
                 }
-                delay(tickDiff.toInt() - off)
+                delay((tickDiff - off).toLong())
             }
         }
     }

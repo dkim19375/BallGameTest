@@ -1,9 +1,9 @@
-package me.dkim19375.ballgametest.view
+package me.dkim19375.tag.view
 
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.layout.VBox
-import me.dkim19375.ballgametest.main
+import me.dkim19375.tag.main
 import tornadofx.View
 
 class GameEndView : View("My View") {

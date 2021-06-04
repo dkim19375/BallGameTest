@@ -1,9 +1,9 @@
-package me.dkim19375.ballgametest
+package me.dkim19375.tag
 
 import javafx.stage.Stage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import me.dkim19375.ballgametest.view.GameView
+import me.dkim19375.tag.view.GameView
 import tornadofx.App
 import tornadofx.launch
 import kotlin.system.exitProcess

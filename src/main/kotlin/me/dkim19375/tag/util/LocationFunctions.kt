@@ -1,9 +1,9 @@
-package me.dkim19375.ballgametest.util
+package me.dkim19375.tag.util
 
 import javafx.geometry.Point2D
 import javafx.scene.Node
 import javafx.scene.shape.Circle
-import me.dkim19375.ballgametest.main
+import me.dkim19375.tag.main
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.max

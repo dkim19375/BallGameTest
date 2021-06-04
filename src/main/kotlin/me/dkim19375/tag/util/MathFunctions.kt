@@ -1,4 +1,4 @@
-package me.dkim19375.ballgametest.util
+package me.dkim19375.tag.util
 
 fun Float.toRadians(): Float = this * Math.PI.toFloat() / 180.0F
 
