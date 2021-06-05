@@ -8,12 +8,12 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
 
-mainClassName = 'me.dkim19375.ballgametest.BallGameTestKt'
+mainClassName = 'me.dkim19375.tag.TagGameKt'
 
 group 'me.dkim19375'
 version '1.0-SNAPSHOT'
 
-final String javafxVersion = '11.0.2'
+final def javafxVersion = '11.0.2'
 
 sourceCompatibility = targetCompatibility = 11
 compileJava.options.encoding = 'UTF-8'
@@ -52,13 +52,8 @@ repositories {
 
 dependencies {
     implementation 'commons-io:commons-io:2.8.0'
-    implementation 'io.github.alekseysotnikov:CmdTool:1.0.1'
-    implementation 'org.jetbrains:annotations:+'
+    compileOnly 'org.jetbrains:annotations:+'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.5.0'
-/*    implementation "org.openjfx:javafx-base:$javafxVersion:${platform}"
-    implementation "org.openjfx:javafx-controls:$javafxVersion:${platform}"
-    implementation "org.openjfx:javafx-graphics:$javafxVersion:${platform}"
-    implementation "org.openjfx:javafx-fxml:$javafxVersion:${platform}"*/
     implementation 'no.tornado:tornadofx:1.7.20'
 }

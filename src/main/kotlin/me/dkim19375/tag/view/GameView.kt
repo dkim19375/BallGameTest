@@ -14,7 +14,14 @@ import kotlinx.coroutines.launch
 import me.dkim19375.tag.SCOPE
 import me.dkim19375.tag.main
 import me.dkim19375.tag.util.*
-import tornadofx.*
+import tornadofx.View
+import tornadofx.circle
+import tornadofx.hbox
+import tornadofx.hide
+import tornadofx.keyboard
+import tornadofx.label
+import tornadofx.pane
+import tornadofx.show
 import kotlin.system.measureTimeMillis
 
 private const val TPS = 500.0
@@ -22,7 +29,7 @@ private val tickDiff: Double
     get() = 1000.0 / TPS
 
 @Suppress("MemberVisibilityCanBePrivate")
-class GameView : View("Ball Game") {
+class GameView : View("Tag Game") {
     override val root: Pane = pane { start() }
     lateinit var user: Circle
         private set
