@@ -12,7 +12,10 @@ import javafx.scene.text.Font
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.dkim19375.tag.SCOPE
+import me.dkim19375.tag.VIEW_TITLE
 import me.dkim19375.tag.main
+import me.dkim19375.tag.multiplayer.Profile
+import me.dkim19375.tag.packet.out.SpeedChangePacketOut
 import me.dkim19375.tag.util.*
 import tornadofx.View
 import tornadofx.circle
@@ -29,8 +32,17 @@ private val tickDiff: Double
     get() = 1000.0 / TPS
 
 @Suppress("MemberVisibilityCanBePrivate")
-class GameView : View("Tag Game") {
-    override val root: Pane = pane { start() }
+class GameView : View(VIEW_TITLE) {
+    override val root: Pane = pane {
+        keyboard {
+            addEventHandler(KeyEvent.KEY_PRESSED) { event ->
+                pressed.add(getCharFromEvent(event) ?: return@addEventHandler)
+            }
+            addEventHandler(KeyEvent.KEY_RELEASED) { event ->
+                pressed.remove(getCharFromEvent(event) ?: return@addEventHandler)
+            }
+        }
+    }
     lateinit var user: Circle
         private set
     lateinit var enemy: Circle
@@ -49,8 +61,39 @@ class GameView : View("Tag Game") {
     var gameStarted = false
     var pressed = mutableSetOf<KeyType>()
     var speed = 0.7
+        get() = if (isClient) main.clientManager.speed else field
+        set(newSpeed) = when {
+            isServer -> main.serverManager.handlePacketNonCoroutine(SpeedChangePacketOut(newSpeed))
+            !isMultiplayer -> field = newSpeed
+            else -> {}
+        }
     var lives = 5
+        get() = if (isClient) main.clientManager.lives else field
     var enemyFrozen = false
+    val profile: Profile?
+        get() = run {
+            val server = main.serverManager.profile
+            val client = main.clientManager.profile
+            return when {
+                client != null -> client
+                main.serverManager.enabled -> server
+                else -> null
+            }
+        }
+    val otherProfile: Profile?
+        get() = run {
+            val server = main.serverManager.otherProfile
+            val client = main.clientManager.otherProfile
+            return server ?: client
+        }
+    val isMultiplayer: Boolean
+        get() = profile != null && otherProfile != null
+    val isServer: Boolean
+        get() = profile?.isServer == true
+    val isClient: Boolean
+        get() = profile?.isServer == false
+    val isEnemy: Boolean
+        get() = profile?.isEnemy == true
 
     init {
         main.gameView = this
@@ -130,14 +173,6 @@ class GameView : View("Tag Game") {
             return
         }
         user = circle(centerX = (-200).getX(), centerY = 0.getY(), radius = 50)
-        keyboard {
-            addEventHandler(KeyEvent.KEY_PRESSED) { event ->
-                pressed.add(getCharFromEvent(event) ?: return@addEventHandler)
-            }
-            addEventHandler(KeyEvent.KEY_RELEASED) { event ->
-                pressed.remove(getCharFromEvent(event) ?: return@addEventHandler)
-            }
-        }
     }
 
     private fun Pane.setupVariables() {
@@ -197,21 +232,23 @@ class GameView : View("Tag Game") {
         } catch (e: ConcurrentModificationException) {
             e.printStackTrace()
             return
-        } catch (e: java.util.ConcurrentModificationException) {
-            e.printStackTrace()
-            return
         }
+        val circle = if (isEnemy) enemy else user
         newSet.forEach { type ->
-            user.teleport(
-                user.getPoint(type, speed).setBounds(
-                    maxX = windowX - user.radius * 1.5,
-                    maxY = windowY - user.radius * 1.5,
-                    minX = -(user.radius * 0.5),
-                    minY = -(user.radius * 0.5)
-                )
+            val loc = circle.getPoint(type, speed).setBounds(
+                maxX = windowX - circle.radius * 1.5,
+                maxY = windowY - circle.radius * 1.5,
+                minX = -(circle.radius * 0.5),
+                minY = -(circle.radius * 0.5)
             )
+            circle.teleport(loc)
+            if (isServer) {
+                main.serverManager.newCoords = loc
+            } else if (isClient) {
+                main.clientManager.newCoords = loc
+            }
         }
-        if (!enemyFrozen) {
+        if (!enemyFrozen && !isMultiplayer) {
             val enemyLoc = enemy.getLocation()
             enemy.teleport(enemyLoc.getDirectionPoint(speed * 0.97, enemyLoc.getAngle(user.getLocation())))
         }
@@ -221,16 +258,14 @@ class GameView : View("Tag Game") {
         if (enemyFrozen) {
             return
         }
+        if (isEnemy) {
+            return
+        }
         if (!user.isTouching(enemy)) {
             return
         }
         if (lives <= 1) {
-            active = false
-            SCOPE.launch {
-                gameOverLabel.show()
-                delay(3000L)
-                Platform.runLater { replaceWith<GameEndView>() }
-            }
+            stop()
             return
         }
         lives--
@@ -239,6 +274,15 @@ class GameView : View("Tag Game") {
             enemyFrozen = true
             delay(3000L)
             enemyFrozen = false
+        }
+    }
+
+    fun stop() {
+        active = false
+        SCOPE.launch {
+            gameOverLabel.show()
+            delay(3000L)
+            Platform.runLater { replaceWith<GameEndView>() }
         }
     }
 }
