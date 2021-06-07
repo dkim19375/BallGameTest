@@ -1,10 +1,16 @@
 package me.dkim19375.tag.multiplayer
 
-import io.ktor.client.*
-import io.ktor.client.features.websocket.*
-import io.ktor.http.*
-import io.ktor.http.cio.websocket.*
+import io.ktor.client.HttpClient
+import io.ktor.client.features.websocket.WebSockets
+import io.ktor.client.features.websocket.webSocket
+import io.ktor.http.HttpMethod
+import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.WebSocketSession
+import io.ktor.http.cio.websocket.readText
+import io.ktor.http.cio.websocket.send
 import javafx.geometry.Point2D
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -37,17 +43,17 @@ class ClientManager {
         username: String,
         host: String = this.host,
         port: Int = this.port,
-        success: () -> Unit = {},
-        failure: (ConnectException) -> Unit = {}
+        success: suspend () -> Unit = {},
+        failure: suspend (ConnectException) -> Unit = {}
     ) {
         this.username = username
         this.host = host
         this.port = port
-        SCOPE.launch {
+        CoroutineScope(Dispatchers.Default).launch {
             try {
                 client.webSocket(method = HttpMethod.Get, host = host, port = port, path = "/tag") {
-                    println("test 1")
-                    SCOPE.launch {
+                    println("test 1, is active: $isActive")
+                    launch {
                         val session = this@webSocket
                         this@ClientManager.session = session
                         println("success")
@@ -58,12 +64,12 @@ class ClientManager {
                             if (!(session.isActive)) {
                                 break
                             }
-                            send(Frame.Text("move ${point.x}|${point.y}"))
+                            send("move ${point.x}|${point.y}")
                             delay(10L)
                         }
                     }
                     println("test 2")
-                    SCOPE.launch frames@{
+                    launch frames@{
                         println("listening for frames")
                         while (true) {
                             val frame = incoming.receive()
@@ -112,11 +118,5 @@ class ClientManager {
 
     suspend fun handlePacket(packet: Packet, text: String? = null) {
         packet.execute(session ?: throw IllegalStateException("Session not started!"), text, this)
-    }
-
-    fun handlePacketNonCoroutine(packet: Packet, text: String? = null) {
-        SCOPE.launch {
-            packet.execute(session ?: throw IllegalStateException("Session not started!"), text, this@ClientManager)
-        }
     }
 }

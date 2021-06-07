@@ -16,7 +16,21 @@ import me.dkim19375.tag.VIEW_TITLE
 import me.dkim19375.tag.main
 import me.dkim19375.tag.multiplayer.Profile
 import me.dkim19375.tag.packet.out.SpeedChangePacketOut
-import me.dkim19375.tag.util.*
+import me.dkim19375.tag.util.KeyType
+import me.dkim19375.tag.util.await
+import me.dkim19375.tag.util.centerX
+import me.dkim19375.tag.util.getAngle
+import me.dkim19375.tag.util.getDirectionPoint
+import me.dkim19375.tag.util.getLocation
+import me.dkim19375.tag.util.getPoint
+import me.dkim19375.tag.util.getX
+import me.dkim19375.tag.util.getY
+import me.dkim19375.tag.util.isTouching
+import me.dkim19375.tag.util.setBounds
+import me.dkim19375.tag.util.teleport
+import me.dkim19375.tag.util.toKeyType
+import me.dkim19375.tag.util.windowX
+import me.dkim19375.tag.util.windowY
 import tornadofx.View
 import tornadofx.circle
 import tornadofx.hbox
@@ -63,7 +77,10 @@ class GameView : View(VIEW_TITLE) {
     var speed = 0.7
         get() = if (isClient) main.clientManager.speed else field
         set(newSpeed) = when {
-            isServer -> main.serverManager.handlePacketNonCoroutine(SpeedChangePacketOut(newSpeed))
+            isServer -> run {
+                SCOPE.launch { main.serverManager.handlePacket(SpeedChangePacketOut(newSpeed)) }
+                Unit // ._.
+            }
             !isMultiplayer -> field = newSpeed
             else -> {}
         }

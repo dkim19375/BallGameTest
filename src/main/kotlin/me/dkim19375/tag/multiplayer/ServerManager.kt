@@ -1,17 +1,22 @@
 package me.dkim19375.tag.multiplayer
 
-import io.ktor.application.*
-import io.ktor.features.*
-import io.ktor.http.cio.websocket.*
-import io.ktor.routing.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
-import io.ktor.websocket.*
+import io.ktor.application.install
+import io.ktor.features.origin
+import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.WebSocketSession
+import io.ktor.http.cio.websocket.readText
+import io.ktor.routing.routing
+import io.ktor.server.engine.ApplicationEngine
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
+import io.ktor.websocket.WebSockets
+import io.ktor.websocket.webSocket
 import javafx.geometry.Point2D
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import me.dkim19375.tag.SCOPE
 import me.dkim19375.tag.main
 import me.dkim19375.tag.packet.Packet
 import me.dkim19375.tag.packet.`in`.ConnectPacketIn
@@ -47,7 +52,7 @@ class ServerManager {
         enemy = Random.nextBoolean()
         enabled = true
         this.port = port
-        SCOPE.launch {
+        CoroutineScope(Dispatchers.Default).launch {
             engine = embeddedServer(Netty, port = port) {
                 install(WebSockets)
                 routing {
@@ -88,6 +93,13 @@ class ServerManager {
                                 }
                             }
                         }
+                        /*var i = 0
+                        while (isActive) {
+                            if (i % 10000 == 0) {
+                                println("active")
+                            }
+                            i++
+                        }*/
                     }
                     println("server stopped")
                 }
@@ -98,12 +110,6 @@ class ServerManager {
 
     suspend fun handlePacket(packet: Packet, text: String? = null) {
         packet.execute(session ?: throw IllegalStateException("Session not started!"), text, this)
-    }
-
-    fun handlePacketNonCoroutine(packet: Packet, text: String? = null) {
-        SCOPE.launch {
-            packet.execute(session ?: throw IllegalStateException("Session not started!"), text, this@ServerManager)
-        }
     }
 
     fun stop() {
