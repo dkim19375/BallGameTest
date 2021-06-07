@@ -76,7 +76,10 @@ class ServerManager {
                                 val text = frame.readText()
                                 println("got frame - $text")
                                 when {
-                                    text.startsWith("connect") -> ConnectPacketIn(enemy, username)
+                                    text.startsWith("connect") -> {
+                                        println("got connect packet")
+                                        ConnectPacketIn(enemy, username)
+                                    }
                                     text == "quit" -> otherProfile = null
                                     text == "start" -> handlePacket(GameStartPacketIn(), text)
                                     text == "stop" -> handlePacket(GameStopPacketIn(), text)
@@ -86,6 +89,7 @@ class ServerManager {
                             }
                         }
                     }
+                    println("server stopped")
                 }
             }
             engine?.start()

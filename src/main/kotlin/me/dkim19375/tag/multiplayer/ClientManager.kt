@@ -103,6 +103,7 @@ class ClientManager {
                         handlePacket(ConnectPacketOut(username))
                     }
                 }
+                println("client stopped")
             } catch (e: ConnectException) {
                 failure(e)
             }
