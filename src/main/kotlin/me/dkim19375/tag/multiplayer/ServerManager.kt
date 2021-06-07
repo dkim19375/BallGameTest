@@ -93,13 +93,6 @@ class ServerManager {
                                 }
                             }
                         }
-                        /*var i = 0
-                        while (isActive) {
-                            if (i % 10000 == 0) {
-                                println("active")
-                            }
-                            i++
-                        }*/
                     }
                     println("server stopped")
                 }
