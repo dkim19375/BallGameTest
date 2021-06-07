@@ -37,6 +37,7 @@ class ClientManager {
     var speed: Double = 0.7
     var lives: Int = 5
     var session: WebSocketSession? = null
+    val coroutine = CoroutineScope(Dispatchers.Default)
 
     fun join(
         username: String,
@@ -48,7 +49,7 @@ class ClientManager {
         this.username = username
         this.host = host
         this.port = port
-        CoroutineScope(Dispatchers.Default).launch {
+        coroutine.launch {
             try {
                 client.webSocket(method = HttpMethod.Get, host = host, port = port, path = "/tag") {
                     println("test 1, is active: $isActive")

@@ -47,12 +47,13 @@ class ServerManager {
     var enemy = false
     var newCoords: Point2D? = null
     var session: WebSocketSession? = null
+    val coroutine = CoroutineScope(Dispatchers.Default)
 
     fun start(port: Int = this.port) {
         enemy = Random.nextBoolean()
         enabled = true
         this.port = port
-        CoroutineScope(Dispatchers.Default).launch {
+        coroutine.launch {
             engine = embeddedServer(Netty, port = port) {
                 install(WebSockets)
                 routing {
