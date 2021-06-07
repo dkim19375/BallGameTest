@@ -14,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import me.dkim19375.tag.SCOPE
 import me.dkim19375.tag.packet.Packet
 import me.dkim19375.tag.packet.`in`.GameStartPacketIn
 import me.dkim19375.tag.packet.`in`.GameStopPacketIn
@@ -104,7 +103,7 @@ class ClientManager {
                         }
                     }
                     println("test 3")
-                    SCOPE.launch {
+                    launch {
                         println("sent connect packet")
                         handlePacket(ConnectPacketOut(username))
                     }
