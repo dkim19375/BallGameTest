@@ -47,7 +47,9 @@ class ServerManager {
     var enemy = false
     var newCoords: Point2D? = null
     var session: WebSocketSession? = null
-    val coroutine = CoroutineScope(Dispatchers.Default)
+    // val coroutine = CoroutineScope(Dispatchers.Default)
+    val coroutine: CoroutineScope
+        get() = CoroutineScope(Dispatchers.IO)
 
     fun start(port: Int = this.port) {
         enemy = Random.nextBoolean()
@@ -55,12 +57,14 @@ class ServerManager {
         this.port = port
         coroutine.launch {
             engine = embeddedServer(Netty, port = port) {
+                println("test, is active: $isActive")
                 install(WebSockets)
                 routing {
                     webSocket("/tag") {
                         session = this
                         val ip = call.request.origin.host
                         println("got request from $ip")
+                        println("test 2, is active: $isActive")
                         launch {
                             val session = this@webSocket
                             while (session.isActive && enabled) {
@@ -75,8 +79,7 @@ class ServerManager {
                         }
                         launch {
                             println("listening for frames")
-                            while (true) {
-                                val frame = incoming.receive()
+                            for (frame in incoming) {
                                 println("got a frame")
                                 frame as? Frame.Text ?: continue
                                 val text = frame.readText()
@@ -93,6 +96,7 @@ class ServerManager {
                                     text.startsWith("speed") -> handlePacket(SpeedChangePacketIn(), text)
                                 }
                             }
+                            println("stopped listening for frames")
                         }
                     }
                     println("server stopped")

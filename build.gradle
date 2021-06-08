@@ -66,7 +66,6 @@ dependencies {
     implementation "io.ktor:ktor-utils:$ktorVersion"
 
     implementation 'ch.qos.logback:logback-classic:1.2.3'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.5.0'
+    // implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
     implementation 'no.tornado:tornadofx:1.7.20'
 }
