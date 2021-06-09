@@ -1,15 +1,28 @@
 package me.dkim19375.tag.multiplayer
 
 import io.ktor.client.HttpClient
+import io.ktor.client.features.websocket.DefaultClientWebSocketSession
 import io.ktor.client.features.websocket.WebSockets
 import io.ktor.client.features.websocket.webSocket
+import io.ktor.http.HttpMethod
+import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
+import io.ktor.http.cio.websocket.readText
+import io.ktor.http.cio.websocket.send
 import javafx.geometry.Point2D
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import me.dkim19375.tag.packet.Packet
+import me.dkim19375.tag.packet.`in`.GameStartPacketIn
+import me.dkim19375.tag.packet.`in`.GameStopPacketIn
+import me.dkim19375.tag.packet.`in`.MovePacketIn
+import me.dkim19375.tag.packet.`in`.SpeedChangePacketIn
+import me.dkim19375.tag.packet.out.ConnectPacketOut
+import me.dkim19375.tag.util.awaitUntilNonnull
 import java.net.ConnectException
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -26,6 +39,7 @@ class ClientManager {
     var speed: Double = 0.7
     var lives: Int = 5
     var session: WebSocketSession? = null
+
     // val coroutine = CoroutineScope(Dispatchers.Default)
     val coroutine: CoroutineScope
         get() = CoroutineScope(Dispatchers.IO)
@@ -37,73 +51,81 @@ class ClientManager {
         success: suspend () -> Unit = {},
         failure: suspend (ConnectException) -> Unit = {}
     ) {
+        val coroutine = coroutine
         this.username = username
         this.host = host
         this.port = port
-        CoroutineScope(Dispatchers.IO).launch {
+        coroutine.launch {
             try {
-                client.webSocket(port = 25575, path = "/tag") {
-                    println("test 1, is active: $isActive")
-                }
-                /*launch {
-                        val session = this@webSocket
-                        this@ClientManager.session = session
+                println("is active: ${coroutine.isActive}")
+                println("is active #2: ${coroutine.isActive}")
+                client.webSocket(method = HttpMethod.Get, host = host, port = port, path = "/tag") {
+                    println("test 1, is active: ${coroutine.isActive}, other: $isActive")
+                    coroutine.run {
                         println("success")
                         success()
-                        while (session.isActive) {
-                            val point = awaitUntilNonnull { newCoords }
-                            newCoords = null
-                            if (!(session.isActive)) {
-                                break
-                            }
-                            send("move ${point.x}|${point.y}")
-                            delay(10L)
-                        }
+                        runSession(this@webSocket)
                     }
-                    println("test 2")
-                    launch frames@{
-                        println("listening for frames")
-                        for (frame in incoming) {
-                            frame as? Frame.Text ?: continue
-                            val text = frame.readText()
-                            println("got frame - $text")
-                            when {
-                                text.startsWith("info") -> {
-                                    val args = text.removePrefix("info ").split('|')
-                                    otherProfile = Profile.getProfile(
-                                        username = args[0],
-                                        enemy = args[1].toBooleanStrict(),
-                                        isServer = true,
-                                        location = Point2D(0.0, 0.0)
-                                    )
-                                    profile = Profile.getProfile(
-                                        username = this@ClientManager.username,
-                                        enemy = !args[1].toBooleanStrict(),
-                                        isServer = false,
-                                        location = Point2D(0.0, 0.0)
-                                    )
-                                }
-                                text == "quit" -> {
-                                    otherProfile = null
-                                    return@frames
-                                }
-                                text == "start" -> handlePacket(GameStartPacketIn(), text)
-                                text == "stop" -> handlePacket(GameStopPacketIn(), text)
-                                text.startsWith("move") -> handlePacket(MovePacketIn(text), text)
-                                text.startsWith("speed") -> handlePacket(SpeedChangePacketIn(), text)
-                            }
-                        }
-                        println("stopped listening for frames")
-                    }
-                    println("test 3")
-                    launch {
-                        println("sent connect packet")
-                        handlePacket(ConnectPacketOut(username))
-                    }*/
+                }
                 println("client stopped")
             } catch (e: ConnectException) {
                 failure(e)
             }
+        }
+    }
+
+    private suspend fun runSession(session: DefaultClientWebSocketSession) = coroutineScope {
+        launch {
+            this@ClientManager.session = session
+            while (session.isActive) {
+                val point = awaitUntilNonnull { newCoords }
+                newCoords = null
+                if (!(session.isActive)) {
+                    break
+                }
+                session.send("move ${point.x}|${point.y}")
+                delay(10L)
+            }
+        }
+        println("test 2")
+        launch frames@{
+            println("listening for frames")
+            for (frame in session.incoming) {
+                frame as? Frame.Text ?: continue
+                val text = frame.readText()
+                println("got frame - $text")
+                when {
+                    text.startsWith("info") -> {
+                        val args = text.removePrefix("info ").split('|')
+                        otherProfile = Profile.getProfile(
+                            username = args[0],
+                            enemy = args[1].toBooleanStrict(),
+                            isServer = true,
+                            location = Point2D(0.0, 0.0)
+                        )
+                        profile = Profile.getProfile(
+                            username = username,
+                            enemy = !args[1].toBooleanStrict(),
+                            isServer = false,
+                            location = Point2D(0.0, 0.0)
+                        )
+                    }
+                    text == "quit" -> {
+                        otherProfile = null
+                        return@frames
+                    }
+                    text == "start" -> handlePacket(GameStartPacketIn(), text)
+                    text == "stop" -> handlePacket(GameStopPacketIn(), text)
+                    text.startsWith("move") -> handlePacket(MovePacketIn(text), text)
+                    text.startsWith("speed") -> handlePacket(SpeedChangePacketIn(), text)
+                }
+            }
+            println("stopped listening for frames")
+        }
+        println("test 3")
+        launch {
+            println("sent connect packet")
+            handlePacket(ConnectPacketOut(username))
         }
     }
 

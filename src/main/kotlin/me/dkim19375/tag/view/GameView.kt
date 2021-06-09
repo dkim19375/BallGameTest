@@ -6,6 +6,7 @@ import javafx.scene.control.Label
 import javafx.scene.input.KeyEvent
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
+import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.scene.text.Font
@@ -39,6 +40,8 @@ import tornadofx.keyboard
 import tornadofx.label
 import tornadofx.pane
 import tornadofx.show
+import tornadofx.vbox
+import kotlin.math.min
 import kotlin.system.measureTimeMillis
 
 private const val TPS = 500.0
@@ -61,6 +64,8 @@ class GameView : View(VIEW_TITLE) {
         private set
     lateinit var enemy: Circle
         private set
+    lateinit var topVBox: VBox
+        private set
     lateinit var topHBox: HBox
         private set
     lateinit var scoreLabel: Label
@@ -71,7 +76,10 @@ class GameView : View(VIEW_TITLE) {
         private set
     lateinit var gameOverLabel: Label
         private set
+    lateinit var tpsLabel: Label
+        private set
     var active = false
+    var latestTPS = TPS.toInt()
     var gameStarted = false
     var pressed = mutableSetOf<KeyType>()
     var speed = 0.7
@@ -82,7 +90,8 @@ class GameView : View(VIEW_TITLE) {
                 Unit // ._.
             }
             !isMultiplayer -> field = newSpeed
-            else -> {}
+            else -> {
+            }
         }
     var lives = 5
         get() = if (isClient) main.clientManager.lives else field
@@ -147,8 +156,11 @@ class GameView : View(VIEW_TITLE) {
                     speed += 0.05
                     main.score++
                 }
-                Platform.runLater { scoreLabel.text = "Score: ${main.score}" }
-                Platform.runLater { livesLabel.text = "Lives: $lives" }
+                Platform.runLater {
+                    scoreLabel.text = "Score: ${main.score}"
+                    livesLabel.text = "Lives: $lives"
+                    tpsLabel.text = "TPS: $latestTPS/$${TPS.toInt()}"
+                }
                 first = false
                 delay(1000L)
             }
@@ -164,9 +176,10 @@ class GameView : View(VIEW_TITLE) {
                     move()
                     detectHit()
                 }
-                if ((off > tickDiff) && ((off - tickDiff) / tickDiff >= 1.0)) {
+                if ((off > tickDiff) && ((off - tickDiff) / tickDiff >= 10.0)) {
                     System.err.println("Running ${(off - tickDiff).toInt()}ms behind (${((off - tickDiff) / tickDiff).toInt()} ticks)!")
                 }
+                latestTPS = min((TPS.toInt() - ((off - tickDiff) / tickDiff).toInt()), TPS.toInt())
                 delay((tickDiff - off).toLong())
             }
         }
@@ -198,14 +211,21 @@ class GameView : View(VIEW_TITLE) {
             gameOverLabel.hide()
             return
         }
-        topHBox = hbox {
+        topVBox = vbox {
             alignment = Pos.CENTER
             SCOPE.launch {
                 await { finished }
                 while (true) {
-                    updateTopHBox()
+                    updateTopVBox()
                     delay(50L)
                 }
+            }
+            tpsLabel = label("TPS: 0/0") {
+                font = Font.font("System", 50.0)
+                alignment = Pos.CENTER
+            }
+            topHBox = hbox {
+                alignment = Pos.CENTER
             }
         }
         gameOverLabel = label("Game Over!") {
@@ -223,13 +243,12 @@ class GameView : View(VIEW_TITLE) {
         scoreLabel = topHBox.label("Score: ${main.score}") { font = Font.font("System", 50.0) }
         topHBox.label("                   ") { font = Font.font("System", 70.0) }
         livesLabel = topHBox.label("Lives: $lives") { font = Font.font("System", 50.0) }
-        mainLabel = label("Tag") { font = Font.font("System", 70.0) }
+        mainLabel = topVBox.label("Tag") { font = Font.font("System", 70.0) }
         finished = true
     }
 
-    private fun HBox.updateTopHBox() {
-        mainLabel.teleport(centerX - (mainLabel.width / 2), 50.0)
-        teleport(centerX - (width / 2), 50.0)
+    private fun VBox.updateTopVBox() {
+        teleport(centerX - (width / 2), 20 + height / 2)
     }
 
     private fun Pane.setupEnemyBall() {

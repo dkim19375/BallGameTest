@@ -9,11 +9,13 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.websocket.DefaultWebSocketServerSession
 import io.ktor.websocket.WebSockets
 import io.ktor.websocket.webSocket
 import javafx.geometry.Point2D
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -55,54 +57,60 @@ class ServerManager {
         enemy = Random.nextBoolean()
         enabled = true
         this.port = port
+        val coroutine = coroutine
         coroutine.launch {
             engine = embeddedServer(Netty, port = port) {
                 println("test, is active: $isActive")
                 install(WebSockets)
                 routing {
                     webSocket("/tag") {
-                        session = this
-                        val ip = call.request.origin.host
-                        println("got request from $ip")
-                        println("test 2, is active: $isActive")
-                        launch {
-                            val session = this@webSocket
-                            while (session.isActive && enabled) {
-                                val point = awaitUntilNonnull { newCoords }
-                                newCoords = null
-                                if (!(session.isActive && enabled)) {
-                                    break
-                                }
-                                MovePacketIn(point).execute(session, null, this@ServerManager)
-                                delay(10L)
-                            }
-                        }
-                        launch {
-                            println("listening for frames")
-                            for (frame in incoming) {
-                                println("got a frame")
-                                frame as? Frame.Text ?: continue
-                                val text = frame.readText()
-                                println("got frame - $text")
-                                when {
-                                    text.startsWith("connect") -> {
-                                        println("got connect packet")
-                                        ConnectPacketIn(enemy, username)
-                                    }
-                                    text == "quit" -> otherProfile = null
-                                    text == "start" -> handlePacket(GameStartPacketIn(), text)
-                                    text == "stop" -> handlePacket(GameStopPacketIn(), text)
-                                    text.startsWith("move") -> handlePacket(MovePacketIn(text), text)
-                                    text.startsWith("speed") -> handlePacket(SpeedChangePacketIn(), text)
-                                }
-                            }
-                            println("stopped listening for frames")
+                        coroutine.run {
+                            runSession(this@webSocket)
                         }
                     }
                     println("server stopped")
                 }
             }
             engine?.start()
+        }
+    }
+
+    private suspend fun runSession(session: DefaultWebSocketServerSession) = coroutineScope {
+        this@ServerManager.session = session
+        val ip = session.call.request.origin.host
+        println("got request from $ip")
+        println("test 2, is active: $isActive")
+        launch {
+            while (session.isActive && enabled) {
+                val point = awaitUntilNonnull { newCoords }
+                newCoords = null
+                if (!(session.isActive && enabled)) {
+                    break
+                }
+                MovePacketIn(point).execute(session, null, this@ServerManager)
+                delay(10L)
+            }
+        }
+        launch {
+            println("listening for frames")
+            for (frame in session.incoming) {
+                println("got a frame")
+                frame as? Frame.Text ?: continue
+                val text = frame.readText()
+                println("got frame - $text")
+                when {
+                    text.startsWith("connect") -> {
+                        println("got connect packet")
+                        ConnectPacketIn(enemy, username)
+                    }
+                    text == "quit" -> otherProfile = null
+                    text == "start" -> handlePacket(GameStartPacketIn(), text)
+                    text == "stop" -> handlePacket(GameStopPacketIn(), text)
+                    text.startsWith("move") -> handlePacket(MovePacketIn(text), text)
+                    text.startsWith("speed") -> handlePacket(SpeedChangePacketIn(), text)
+                }
+            }
+            println("stopped listening for frames")
         }
     }
 

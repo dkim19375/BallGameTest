@@ -13,6 +13,7 @@ data class Profile private constructor(
     companion object {
         private val cache = mutableSetOf<Profile>()
 
+        @Synchronized
         fun getProfile(
             username: String,
             enemy: Boolean,
