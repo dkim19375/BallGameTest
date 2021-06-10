@@ -64,9 +64,10 @@ class ServerManager {
                 install(WebSockets)
                 routing {
                     webSocket("/tag") {
-                        coroutine.run {
+                        runSession(this)
+/*                        coroutine.run {
                             runSession(this@webSocket)
-                        }
+                        }*/
                     }
                     println("server stopped")
                 }
