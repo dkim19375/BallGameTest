@@ -8,44 +8,36 @@
 <?import javafx.scene.text.Font?>
 
 
-<VBox alignment="CENTER" prefHeight="476.0" prefWidth="706.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <HBox alignment="CENTER" prefHeight="176.0" prefWidth="770.0">
-         <children>
-            <Label alignment="CENTER" text="Join Lobby">
-               <font>
-                  <Font size="61.0" />
-               </font>
-            </Label>
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" prefHeight="89.0" prefWidth="770.0">
-         <children>
-            <Label prefHeight="39.0" prefWidth="76.0" text="Port:">
-               <font>
-                  <Font size="27.0" />
-               </font>
-            </Label>
-            <TextField fx:id="port" text="25575" />
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" prefHeight="188.0" prefWidth="770.0">
-         <children>
-            <Button fx:id="joinButton" alignment="CENTER" mnemonicParsing="false" prefHeight="62.0" prefWidth="250.0" text="Join Game">
-               <font>
-                  <Font size="24.0" />
-               </font>
-            </Button>
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" prefHeight="89.0" prefWidth="770.0">
-         <children>
-            <Label fx:id="error" alignment="CENTER" text="Error: None">
-               <font>
-                  <Font size="27.0" />
-               </font>
-            </Label>
-         </children>
-      </HBox>
-   </children>
+<VBox alignment="CENTER" prefHeight="476.0" prefWidth="706.0" xmlns="http://javafx.com/javafx/15.0.1"
+      xmlns:fx="http://javafx.com/fxml/1">
+    <HBox alignment="CENTER" prefHeight="176.0" prefWidth="770.0">
+        <Label alignment="CENTER" text="Join Lobby">
+            <font>
+                <Font size="61.0"/>
+            </font>
+        </Label>
+    </HBox>
+    <HBox alignment="CENTER" prefHeight="89.0" prefWidth="770.0">
+        <Label prefHeight="39.0" prefWidth="76.0" text="IP:">
+            <font>
+                <Font size="27.0"/>
+            </font>
+        </Label>
+        <TextField fx:id="ip" text="localhost:25575"/>
+    </HBox>
+    <HBox alignment="CENTER" prefHeight="188.0" prefWidth="770.0">
+        <Button fx:id="joinButton" alignment="CENTER" mnemonicParsing="false" prefHeight="62.0" prefWidth="250.0"
+                text="Join Game">
+            <font>
+                <Font size="24.0"/>
+            </font>
+        </Button>
+    </HBox>
+    <HBox alignment="CENTER" prefHeight="89.0" prefWidth="770.0">
+        <Label fx:id="error" alignment="CENTER" text="Error: None">
+            <font>
+                <Font size="27.0"/>
+            </font>
+        </Label>
+    </HBox>
 </VBox>

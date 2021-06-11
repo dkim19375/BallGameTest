@@ -84,6 +84,7 @@ class LobbyView : View(VIEW_TITLE) {
                 return@setOnAction
             }
             SCOPE.launch {
+                println("sent game start packet")
                 main.serverManager.handlePacket(GameStartPacketOut())
             }
         }

@@ -15,8 +15,8 @@ import tornadofx.show
 class JoinLobbyView : View(VIEW_TITLE) {
     override val root: VBox by fxml()
     private val joinButton: Button by fxid()
-    private val port: TextField by fxid()
-    val error: Label by fxid()
+    private val ip: TextField by fxid()
+    private val error: Label by fxid()
     private var started = false
 
     init {
@@ -33,9 +33,13 @@ class JoinLobbyView : View(VIEW_TITLE) {
             }
             error.hide()
             started = true
+            val array = ip.text.split(':')
+            val host = array[0]
+            val port: Int = array.getOrNull(1)?.toIntOrNull() ?: main.clientManager.port
             main.clientManager.join(
                 username = "Client",
-                port = port.text.toIntOrNull() ?: main.clientManager.port,
+                host = host,
+                port = port,
                 success = {
                     Platform.runLater {
                         changeRoot<LobbyView>()

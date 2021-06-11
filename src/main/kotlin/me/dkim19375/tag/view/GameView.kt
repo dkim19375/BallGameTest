@@ -28,6 +28,7 @@ import me.dkim19375.tag.util.getPoint
 import me.dkim19375.tag.util.getX
 import me.dkim19375.tag.util.getY
 import me.dkim19375.tag.util.isTouching
+import me.dkim19375.tag.util.onMainThread
 import me.dkim19375.tag.util.setBounds
 import me.dkim19375.tag.util.teleport
 import me.dkim19375.tag.util.toKeyType
@@ -142,6 +143,12 @@ class GameView : View(VIEW_TITLE) {
     fun startWithPaneParam(pane: Pane) = pane.start()
 
     fun Pane.start() {
+        if (!onMainThread()) {
+            Platform.runLater {
+                start()
+            }
+            return
+        }
         reset()
         active = true
         setupUserBall()
@@ -319,7 +326,7 @@ class GameView : View(VIEW_TITLE) {
         SCOPE.launch {
             gameOverLabel.show()
             delay(3000L)
-            Platform.runLater { changeRoot<GameEndView>() }
+            changeRoot<GameEndView>()
         }
     }
 }

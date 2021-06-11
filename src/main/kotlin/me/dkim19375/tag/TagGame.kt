@@ -18,6 +18,8 @@ lateinit var main: BallGameTest
     private set
 val SCOPE: CoroutineScope = CoroutineScope(Dispatchers.Default)
 const val VIEW_TITLE = "Tag Game"
+lateinit var THREAD: Thread
+    private set
 
 fun main(args: Array<String>) {
     launch<BallGameTest>(*args)
@@ -42,6 +44,7 @@ class BallGameTest : App(StartView::class) {
     }
 
     override fun start(stage: Stage) {
+        THREAD = Thread.currentThread()
         this.stage = stage
         stage.isMaximized = true
         stage.height = 1080.0

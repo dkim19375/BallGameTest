@@ -16,6 +16,7 @@ class GameStartPacketIn : Packet {
         manager: ClientManager
     ): Pair<Profile?, Profile?> {
         changeRoot<GameView>()
+        println("SWITCHED")
         main.gameView.startWithPaneParam(main.gameView.root)
         return Pair(manager.profile, manager.otherProfile)
     }
