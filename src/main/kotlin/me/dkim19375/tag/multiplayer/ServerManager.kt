@@ -6,9 +6,9 @@ import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
 import io.ktor.http.cio.websocket.readText
 import io.ktor.routing.routing
+import io.ktor.server.cio.CIO
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
 import io.ktor.websocket.DefaultWebSocketServerSession
 import io.ktor.websocket.WebSockets
 import io.ktor.websocket.webSocket
@@ -28,6 +28,7 @@ import me.dkim19375.tag.packet.`in`.MovePacketIn
 import me.dkim19375.tag.packet.`in`.SpeedChangePacketIn
 import me.dkim19375.tag.util.awaitUntilNonnull
 import me.dkim19375.tag.util.getLocation
+import me.dkim19375.tag.util.isInit
 import kotlin.random.Random
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -39,7 +40,10 @@ class ServerManager {
     var username = "Host"
     val profile: Profile
         get() = Profile.getProfile(
-            username, enemy, true, try {
+            username = username,
+            enemy = enemy,
+            isServer = true,
+            location = try {
                 main.gameView.user.getLocation()
             } catch (_: UninitializedPropertyAccessException) {
                 Point2D(0.0, 0.0)
@@ -57,19 +61,14 @@ class ServerManager {
         enemy = Random.nextBoolean()
         enabled = true
         this.port = port
-        val coroutine = coroutine
         coroutine.launch {
-            engine = embeddedServer(Netty, port = port) {
+            engine = embeddedServer(CIO, port = port) {
                 println("test, is active: $isActive")
                 install(WebSockets)
                 routing {
                     webSocket("/tag") {
                         runSession(this)
-/*                        coroutine.run {
-                            runSession(this@webSocket)
-                        }*/
                     }
-                    println("server stopped")
                 }
             }
             engine?.start()
@@ -80,7 +79,7 @@ class ServerManager {
         this@ServerManager.session = session
         val ip = session.call.request.origin.host
         println("got request from $ip")
-        println("test 2, is active: $isActive")
+        println("test 2, is active: $isActive, is init: ${main::lobbyView.isInit()}")
         launch {
             while (session.isActive && enabled) {
                 val point = awaitUntilNonnull { newCoords }
@@ -112,6 +111,7 @@ class ServerManager {
                 }
             }
             println("stopped listening for frames")
+            stop()
         }
     }
 

@@ -19,8 +19,3 @@ suspend fun <T> awaitUntilNonnull(delay: Long = 0L, action: () -> T?): T {
         delay(delay)
     }
 }
-
-fun sleep(amount: Long) {
-    val time = System.currentTimeMillis()
-    while (System.currentTimeMillis() < (amount + time)) {}
-}

@@ -1,6 +1,7 @@
 package me.dkim19375.tag.packet.`in`
 
-import io.ktor.http.cio.websocket.*
+import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.WebSocketSession
 import me.dkim19375.tag.multiplayer.ClientManager
 import me.dkim19375.tag.multiplayer.Profile
 import me.dkim19375.tag.multiplayer.ServerManager

@@ -1,6 +1,7 @@
 package me.dkim19375.tag.multiplayer
 
 import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
 import io.ktor.client.features.websocket.DefaultClientWebSocketSession
 import io.ktor.client.features.websocket.WebSockets
 import io.ktor.client.features.websocket.webSocket
@@ -30,7 +31,7 @@ class ClientManager {
     var host = "127.0.0.1"
     var port = 25575
     var username = "Client"
-    val client: HttpClient = HttpClient {
+    val client: HttpClient = HttpClient(CIO) {
         install(WebSockets)
     }
     var profile: Profile? = null
@@ -75,8 +76,10 @@ class ClientManager {
     }
 
     private suspend fun runSession(session: DefaultClientWebSocketSession) = coroutineScope {
+        this@ClientManager.session = session
+        println("sent connect packet")
+        handlePacket(ConnectPacketOut(username))
         launch {
-            this@ClientManager.session = session
             while (session.isActive) {
                 val point = awaitUntilNonnull { newCoords }
                 newCoords = null
@@ -123,10 +126,6 @@ class ClientManager {
             println("stopped listening for frames")
         }
         println("test 3")
-        launch {
-            println("sent connect packet")
-            handlePacket(ConnectPacketOut(username))
-        }
     }
 
     suspend fun handlePacket(packet: Packet, text: String? = null) {

@@ -45,6 +45,7 @@ class LobbyView : View(VIEW_TITLE) {
     private var opened = false
 
     fun reset() {
+        println("profile: $profile, otherProfile: $otherProfile, isServer: $isServer, isClient: $isClient")
         startButton.show()
         startButton.text = "Open Lobby"
         if (isClient) {
@@ -57,6 +58,7 @@ class LobbyView : View(VIEW_TITLE) {
 
     init {
         main.lobbyView = this
+        println("init")
         reset()
         SCOPE.launch {
             while (true) {
