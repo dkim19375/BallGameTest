@@ -1,11 +1,11 @@
 package me.dkim19375.tag.packet.`in`
 
-import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
 import me.dkim19375.tag.multiplayer.ClientManager
 import me.dkim19375.tag.multiplayer.Profile
 import me.dkim19375.tag.multiplayer.ServerManager
 import me.dkim19375.tag.packet.Packet
+import me.dkim19375.tag.packet.out.InfoPacketOut
 
 @Suppress("MemberVisibilityCanBePrivate")
 class ConnectPacketIn(val enemy: Boolean, val username: String) : Packet {
@@ -26,7 +26,7 @@ class ConnectPacketIn(val enemy: Boolean, val username: String) : Packet {
         val username = text.removePrefix("connect ")
         val profile = Profile.getProfile(username, !enemy, false)
         manager.otherProfile = profile
-        socket.send(Frame.Text("info ${this.username}|$enemy"))
+        manager.handlePacket(InfoPacketOut())
         return Pair(manager.profile, profile)
     }
 }

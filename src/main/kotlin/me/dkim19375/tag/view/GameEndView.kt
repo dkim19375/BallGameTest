@@ -5,6 +5,7 @@ import javafx.scene.control.Label
 import javafx.scene.layout.VBox
 import me.dkim19375.tag.VIEW_TITLE
 import me.dkim19375.tag.main
+import me.dkim19375.tag.util.changeRoot
 import tornadofx.View
 
 class GameEndView : View(VIEW_TITLE) {
@@ -13,9 +14,10 @@ class GameEndView : View(VIEW_TITLE) {
     private val playAgainButton: Button by fxid()
 
     init {
+        main.gameEndView = this
         score.text = "Score: ${main.score}"
         playAgainButton.setOnAction {
-            replaceWith<GameView>()
+            changeRoot<GameView>()
             main.gameView.startWithPaneParam(main.gameView.root)
         }
     }

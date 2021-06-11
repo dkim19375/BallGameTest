@@ -20,6 +20,7 @@ import me.dkim19375.tag.packet.out.SpeedChangePacketOut
 import me.dkim19375.tag.util.KeyType
 import me.dkim19375.tag.util.await
 import me.dkim19375.tag.util.centerX
+import me.dkim19375.tag.util.changeRoot
 import me.dkim19375.tag.util.getAngle
 import me.dkim19375.tag.util.getDirectionPoint
 import me.dkim19375.tag.util.getLocation
@@ -318,7 +319,7 @@ class GameView : View(VIEW_TITLE) {
         SCOPE.launch {
             gameOverLabel.show()
             delay(3000L)
-            Platform.runLater { replaceWith<GameEndView>() }
+            Platform.runLater { changeRoot<GameEndView>() }
         }
     }
 }

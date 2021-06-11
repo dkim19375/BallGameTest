@@ -1,23 +1,19 @@
-package me.dkim19375.tag.packet.`in`
+package me.dkim19375.tag.packet.out
 
 import io.ktor.http.cio.websocket.WebSocketSession
-import me.dkim19375.tag.main
+import io.ktor.http.cio.websocket.send
 import me.dkim19375.tag.multiplayer.ClientManager
 import me.dkim19375.tag.multiplayer.Profile
 import me.dkim19375.tag.multiplayer.ServerManager
 import me.dkim19375.tag.packet.Packet
-import me.dkim19375.tag.util.changeRoot
-import me.dkim19375.tag.view.GameView
 
-class GameStartPacketIn : Packet {
+class InfoPacketOut : Packet {
     override suspend fun execute(
         socket: WebSocketSession,
         text: String?,
         manager: ClientManager
     ): Pair<Profile?, Profile?> {
-        changeRoot<GameView>()
-        main.gameView.startWithPaneParam(main.gameView.root)
-        return Pair(manager.profile, manager.otherProfile)
+        throw IllegalStateException("Cannot execute from ClientManager!")
     }
 
     override suspend fun execute(
@@ -25,10 +21,8 @@ class GameStartPacketIn : Packet {
         text: String?,
         manager: ServerManager
     ): Pair<Profile?, Profile?> {
-        changeRoot<GameView>()
-        main.gameView.run {
-            startWithPaneParam(main.gameView.root)
-        }
+        val otherProfile = manager.otherProfile ?: throw IllegalStateException("otherProfile must not be null!")
+        socket.send("info ${manager.profile.username}|${otherProfile.isEnemy}")
         return Pair(manager.profile, manager.otherProfile)
     }
 }

@@ -4,6 +4,7 @@ import javafx.scene.control.Button
 import javafx.scene.layout.VBox
 import me.dkim19375.tag.VIEW_TITLE
 import me.dkim19375.tag.main
+import me.dkim19375.tag.util.changeRoot
 import tornadofx.View
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -15,6 +16,7 @@ class StartView : View(VIEW_TITLE) {
     val startServerButton: Button by fxid()
 
     init {
+        main.startView = this
         start()
     }
 
@@ -25,7 +27,7 @@ class StartView : View(VIEW_TITLE) {
                 return@setOnAction
             }
             started = true
-            replaceWith<GameView>()
+            changeRoot<GameView>()
             main.gameView.startWithPaneParam(main.gameView.root)
         }
         startServerButton.setOnAction {
@@ -33,7 +35,7 @@ class StartView : View(VIEW_TITLE) {
                 return@setOnAction
             }
             started = true
-            replaceWith<LobbyView>()
+            changeRoot<LobbyView>()
             main.lobbyView.reset()
         }
         playMultiButton.setOnAction {
@@ -41,7 +43,7 @@ class StartView : View(VIEW_TITLE) {
                 return@setOnAction
             }
             started = true
-            replaceWith<JoinLobbyView>()
+            changeRoot<JoinLobbyView>()
         }
     }
 }

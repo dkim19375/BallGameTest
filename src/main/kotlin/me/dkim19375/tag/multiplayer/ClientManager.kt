@@ -20,10 +20,12 @@ import kotlinx.coroutines.launch
 import me.dkim19375.tag.packet.Packet
 import me.dkim19375.tag.packet.`in`.GameStartPacketIn
 import me.dkim19375.tag.packet.`in`.GameStopPacketIn
+import me.dkim19375.tag.packet.`in`.InfoPacketIn
 import me.dkim19375.tag.packet.`in`.MovePacketIn
 import me.dkim19375.tag.packet.`in`.SpeedChangePacketIn
 import me.dkim19375.tag.packet.out.ConnectPacketOut
 import me.dkim19375.tag.util.awaitUntilNonnull
+import me.dkim19375.tag.util.sendDebugPacketMsg
 import java.net.ConnectException
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -98,21 +100,7 @@ class ClientManager {
                 val text = frame.readText()
                 println("got frame - $text")
                 when {
-                    text.startsWith("info") -> {
-                        val args = text.removePrefix("info ").split('|')
-                        otherProfile = Profile.getProfile(
-                            username = args[0],
-                            enemy = args[1].toBooleanStrict(),
-                            isServer = true,
-                            location = Point2D(0.0, 0.0)
-                        )
-                        profile = Profile.getProfile(
-                            username = username,
-                            enemy = !args[1].toBooleanStrict(),
-                            isServer = false,
-                            location = Point2D(0.0, 0.0)
-                        )
-                    }
+                    text.startsWith("info") -> handlePacket(InfoPacketIn(), text)
                     text == "quit" -> {
                         otherProfile = null
                         return@frames
@@ -129,6 +117,13 @@ class ClientManager {
     }
 
     suspend fun handlePacket(packet: Packet, text: String? = null) {
-        packet.execute(session ?: throw IllegalStateException("Session not started!"), text, this)
+        kotlin.runCatching {
+            packet.execute(
+                socket = session ?: throw IllegalStateException("Session not started!"),
+                text = text,
+                manager = this
+            )
+        }.exceptionOrNull()?.printStackTrace()
+        packet.sendDebugPacketMsg(text)
     }
 }

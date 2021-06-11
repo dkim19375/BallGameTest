@@ -7,6 +7,7 @@ import javafx.scene.control.TextField
 import javafx.scene.layout.VBox
 import me.dkim19375.tag.VIEW_TITLE
 import me.dkim19375.tag.main
+import me.dkim19375.tag.util.changeRoot
 import tornadofx.View
 import tornadofx.hide
 import tornadofx.show
@@ -19,6 +20,7 @@ class JoinLobbyView : View(VIEW_TITLE) {
     private var started = false
 
     init {
+        main.joinLobbyView = this
         start()
     }
 
@@ -36,7 +38,7 @@ class JoinLobbyView : View(VIEW_TITLE) {
                 port = port.text.toIntOrNull() ?: main.clientManager.port,
                 success = {
                     Platform.runLater {
-                        replaceWith<LobbyView>()
+                        changeRoot<LobbyView>()
                         main.lobbyView.reset()
                     }
                 }

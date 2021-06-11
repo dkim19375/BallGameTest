@@ -19,7 +19,7 @@ import tornadofx.show
 class LobbyView : View(VIEW_TITLE) {
     override val root: VBox by fxml()
     private val otherLabel: Label by fxid()
-    private val startButton: Button by fxid()
+    val startButton: Button by fxid()
     private val port: TextField by fxid()
     private val portText: Label by fxid()
     val profile: Profile?
@@ -45,7 +45,7 @@ class LobbyView : View(VIEW_TITLE) {
     private var opened = false
 
     fun reset() {
-        println("profile: $profile, otherProfile: $otherProfile, isServer: $isServer, isClient: $isClient")
+        printDebug()
         startButton.show()
         startButton.text = "Open Lobby"
         if (isClient) {
@@ -54,6 +54,10 @@ class LobbyView : View(VIEW_TITLE) {
             startButton.hide()
         }
         port.text = main.serverManager.port.toString()
+    }
+
+    fun printDebug() {
+        println("profile: $profile, otherProfile: $otherProfile, isServer: $isServer, isClient: $isClient")
     }
 
     init {

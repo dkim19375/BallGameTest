@@ -5,7 +5,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import me.dkim19375.tag.multiplayer.ClientManager
 import me.dkim19375.tag.multiplayer.ServerManager
+import me.dkim19375.tag.view.GameEndView
 import me.dkim19375.tag.view.GameView
+import me.dkim19375.tag.view.JoinLobbyView
 import me.dkim19375.tag.view.LobbyView
 import me.dkim19375.tag.view.StartView
 import tornadofx.App
@@ -25,8 +27,11 @@ fun main(args: Array<String>) {
 class BallGameTest : App(StartView::class) {
     lateinit var stage: Stage
         private set
+    lateinit var gameEndView: GameEndView
     lateinit var gameView: GameView
+    lateinit var joinLobbyView: JoinLobbyView
     lateinit var lobbyView: LobbyView
+    lateinit var startView: StartView
     val serverManager = ServerManager()
     val clientManager = ClientManager()
     var score = 0

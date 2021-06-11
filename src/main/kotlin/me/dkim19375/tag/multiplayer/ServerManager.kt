@@ -22,13 +22,13 @@ import kotlinx.coroutines.launch
 import me.dkim19375.tag.main
 import me.dkim19375.tag.packet.Packet
 import me.dkim19375.tag.packet.`in`.ConnectPacketIn
-import me.dkim19375.tag.packet.`in`.GameStartPacketIn
 import me.dkim19375.tag.packet.`in`.GameStopPacketIn
 import me.dkim19375.tag.packet.`in`.MovePacketIn
 import me.dkim19375.tag.packet.`in`.SpeedChangePacketIn
 import me.dkim19375.tag.util.awaitUntilNonnull
 import me.dkim19375.tag.util.getLocation
 import me.dkim19375.tag.util.isInit
+import me.dkim19375.tag.util.sendDebugPacketMsg
 import kotlin.random.Random
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -99,12 +99,8 @@ class ServerManager {
                 val text = frame.readText()
                 println("got frame - $text")
                 when {
-                    text.startsWith("connect") -> {
-                        println("got connect packet")
-                        ConnectPacketIn(enemy, username)
-                    }
+                    text.startsWith("connect") -> handlePacket(ConnectPacketIn(enemy, username), text)
                     text == "quit" -> otherProfile = null
-                    text == "start" -> handlePacket(GameStartPacketIn(), text)
                     text == "stop" -> handlePacket(GameStopPacketIn(), text)
                     text.startsWith("move") -> handlePacket(MovePacketIn(text), text)
                     text.startsWith("speed") -> handlePacket(SpeedChangePacketIn(), text)
@@ -116,7 +112,14 @@ class ServerManager {
     }
 
     suspend fun handlePacket(packet: Packet, text: String? = null) {
-        packet.execute(session ?: throw IllegalStateException("Session not started!"), text, this)
+        kotlin.runCatching {
+            packet.execute(
+                socket = session ?: throw IllegalStateException("Session not started!"),
+                text = text,
+                manager = this
+            )
+        }.exceptionOrNull()?.printStackTrace()
+        packet.sendDebugPacketMsg(text)
     }
 
     fun stop() {
