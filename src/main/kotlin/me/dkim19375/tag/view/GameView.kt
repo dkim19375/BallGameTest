@@ -167,7 +167,7 @@ class GameView : View(VIEW_TITLE) {
                 Platform.runLater {
                     scoreLabel.text = "Score: ${main.score}"
                     livesLabel.text = "Lives: $lives"
-                    tpsLabel.text = "TPS: $latestTPS/$${TPS.toInt()}"
+                    tpsLabel.text = "TPS: $latestTPS/${TPS.toInt()}"
                 }
                 first = false
                 delay(1000L)
@@ -270,15 +270,10 @@ class GameView : View(VIEW_TITLE) {
         }
     }
 
+    @Synchronized
     private fun move() {
-        val newSet = try {
-            pressed.toSet()
-        } catch (e: ConcurrentModificationException) {
-            e.printStackTrace()
-            return
-        }
         val circle = if (isEnemy) enemy else user
-        newSet.forEach { type ->
+        pressed.toSet().forEach { type ->
             val loc = circle.getPoint(type, speed).setBounds(
                 maxX = windowX - circle.radius * 1.5,
                 maxY = windowY - circle.radius * 1.5,
