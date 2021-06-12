@@ -98,16 +98,20 @@ class ServerManager {
                 frame as? Frame.Text ?: continue
                 val text = frame.readText()
                 println("got frame - $text")
-                when {
-                    text.startsWith("connect") -> handlePacket(ConnectPacketIn(enemy, username), text)
-                    text == "quit" -> otherProfile = null
-                    text == "stop" -> handlePacket(GameStopPacketIn(), text)
-                    text.startsWith("move") -> handlePacket(MovePacketIn(text), text)
-                    text.startsWith("speed") -> handlePacket(SpeedChangePacketIn(), text)
-                }
+                onPacketReceiving(text)
             }
             println("stopped listening for frames")
             stop()
+        }
+    }
+
+    suspend fun onPacketReceiving(text: String) = coroutineScope {
+        when {
+            text.startsWith("connect") -> handlePacket(ConnectPacketIn(enemy, username), text)
+            text == "quit" -> otherProfile = null
+            text == "stop" -> handlePacket(GameStopPacketIn(), text)
+            text.startsWith("move") -> handlePacket(MovePacketIn(text), text)
+            text.startsWith("speed") -> handlePacket(SpeedChangePacketIn(), text)
         }
     }
 

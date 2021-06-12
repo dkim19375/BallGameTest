@@ -99,21 +99,25 @@ class ClientManager {
                 frame as? Frame.Text ?: continue
                 val text = frame.readText()
                 println("got frame - $text")
-                when {
-                    text.startsWith("info") -> handlePacket(InfoPacketIn(), text)
-                    text == "quit" -> {
-                        otherProfile = null
-                        return@frames
-                    }
-                    text == "start" -> handlePacket(GameStartPacketIn(), text)
-                    text == "stop" -> handlePacket(GameStopPacketIn(), text)
-                    text.startsWith("move") -> handlePacket(MovePacketIn(text), text)
-                    text.startsWith("speed") -> handlePacket(SpeedChangePacketIn(), text)
+                onPacketReceiving(text)
+                if (text == "quit") {
+                    return@frames
                 }
             }
             println("stopped listening for frames")
         }
         println("test 3")
+    }
+
+    suspend fun onPacketReceiving(text: String) = coroutineScope {
+        when {
+            text.startsWith("info") -> handlePacket(InfoPacketIn(), text)
+            text == "quit" -> otherProfile = null
+            text == "start" -> handlePacket(GameStartPacketIn(), text)
+            text == "stop" -> handlePacket(GameStopPacketIn(), text)
+            text.startsWith("move") -> handlePacket(MovePacketIn(text), text)
+            text.startsWith("speed") -> handlePacket(SpeedChangePacketIn(), text)
+        }
     }
 
     suspend fun handlePacket(packet: Packet, text: String? = null) {
