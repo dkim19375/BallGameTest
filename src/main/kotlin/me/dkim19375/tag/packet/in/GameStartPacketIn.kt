@@ -6,8 +6,9 @@ import me.dkim19375.tag.multiplayer.ClientManager
 import me.dkim19375.tag.multiplayer.Profile
 import me.dkim19375.tag.multiplayer.ServerManager
 import me.dkim19375.tag.packet.Packet
-import me.dkim19375.tag.util.changeRoot
+import me.dkim19375.tag.util.changeView
 import me.dkim19375.tag.view.GameView
+import me.dkim19375.tag.view.LobbyView
 
 class GameStartPacketIn : Packet {
     override suspend fun execute(
@@ -15,8 +16,7 @@ class GameStartPacketIn : Packet {
         text: String?,
         manager: ClientManager
     ): Pair<Profile?, Profile?> {
-        changeRoot<GameView>()
-        println("SWITCHED")
+        main::lobbyView.changeView<LobbyView, GameView>()
         main.gameView.startWithPaneParam(main.gameView.root)
         return Pair(manager.profile, manager.otherProfile)
     }
@@ -26,10 +26,9 @@ class GameStartPacketIn : Packet {
         text: String?,
         manager: ServerManager
     ): Pair<Profile?, Profile?> {
-        changeRoot<GameView>()
-        main.gameView.run {
-            startWithPaneParam(main.gameView.root)
-        }
+        main::lobbyView.changeView<LobbyView, GameView>()
+        main.stage.scene.root
+        main.gameView.startWithPaneParam(main.gameView.root)
         return Pair(manager.profile, manager.otherProfile)
     }
 }

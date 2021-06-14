@@ -14,7 +14,7 @@ import tornadofx.App
 import tornadofx.launch
 import kotlin.system.exitProcess
 
-lateinit var main: BallGameTest
+lateinit var main: Tag
     private set
 val SCOPE: CoroutineScope = CoroutineScope(Dispatchers.Default)
 const val VIEW_TITLE = "Tag Game"
@@ -22,11 +22,11 @@ lateinit var THREAD: Thread
     private set
 
 fun main(args: Array<String>) {
-    launch<BallGameTest>(*args)
+    launch<Tag>(*args)
 }
 
 @Suppress("MemberVisibilityCanBePrivate")
-class BallGameTest : App(StartView::class) {
+class Tag : App(StartView::class) {
     lateinit var stage: Stage
         private set
     lateinit var gameEndView: GameEndView

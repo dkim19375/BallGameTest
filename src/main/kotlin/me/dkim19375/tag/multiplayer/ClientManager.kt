@@ -17,6 +17,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import me.dkim19375.tag.main
 import me.dkim19375.tag.packet.Packet
 import me.dkim19375.tag.packet.`in`.GameStartPacketIn
 import me.dkim19375.tag.packet.`in`.GameStopPacketIn
