@@ -6,7 +6,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
 <VBox alignment="CENTER" prefHeight="554.0" prefWidth="958.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox alignment="CENTER" prefHeight="209.0" prefWidth="958.0">
@@ -29,16 +28,7 @@
       </HBox>
       <HBox alignment="CENTER" prefHeight="70.0" prefWidth="200.0">
          <children>
-            <Button fx:id="playMultiButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="350.0" text="Multiplayer">
-               <font>
-                  <Font size="24.0" />
-               </font>
-            </Button>
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" prefHeight="70.0" prefWidth="200.0">
-         <children>
-            <Button fx:id="startServerButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="350.0" text="Start a Server">
+            <Button fx:id="skinsButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="350.0" text="Skins">
                <font>
                   <Font size="24.0" />
                </font>

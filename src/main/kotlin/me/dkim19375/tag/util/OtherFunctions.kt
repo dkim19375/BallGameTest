@@ -5,8 +5,6 @@ import me.dkim19375.tag.THREAD
 import me.dkim19375.tag.main
 import me.dkim19375.tag.view.GameEndView
 import me.dkim19375.tag.view.GameView
-import me.dkim19375.tag.view.JoinLobbyView
-import me.dkim19375.tag.view.LobbyView
 import me.dkim19375.tag.view.StartView
 import tornadofx.View
 import java.util.concurrent.CompletableFuture
@@ -24,12 +22,6 @@ inline fun <reified T : View> changeRoot() {
         return
     }
     if (main::gameView.changeView<GameView, T>()) {
-        return
-    }
-    if (main::joinLobbyView.changeView<JoinLobbyView, T>()) {
-        return
-    }
-    if (main::lobbyView.changeView<LobbyView, T>()) {
         return
     }
     if (main::startView.changeView<StartView, T>()) {

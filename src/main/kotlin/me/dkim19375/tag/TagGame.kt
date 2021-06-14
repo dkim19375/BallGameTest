@@ -3,12 +3,8 @@ package me.dkim19375.tag
 import javafx.stage.Stage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import me.dkim19375.tag.multiplayer.ClientManager
-import me.dkim19375.tag.multiplayer.ServerManager
 import me.dkim19375.tag.view.GameEndView
 import me.dkim19375.tag.view.GameView
-import me.dkim19375.tag.view.JoinLobbyView
-import me.dkim19375.tag.view.LobbyView
 import me.dkim19375.tag.view.StartView
 import tornadofx.App
 import tornadofx.launch
@@ -31,13 +27,8 @@ class Tag : App(StartView::class) {
         private set
     lateinit var gameEndView: GameEndView
     lateinit var gameView: GameView
-    lateinit var joinLobbyView: JoinLobbyView
-    lateinit var lobbyView: LobbyView
     lateinit var startView: StartView
-    val serverManager = ServerManager()
-    val clientManager = ClientManager()
     var score = 0
-    var multiScore = 0
 
     init {
         main = this
@@ -54,7 +45,6 @@ class Tag : App(StartView::class) {
     }
 
     override fun stop() {
-        serverManager.stop()
         exitProcess(0)
     }
 }

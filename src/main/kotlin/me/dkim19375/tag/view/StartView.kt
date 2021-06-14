@@ -12,8 +12,6 @@ class StartView : View(VIEW_TITLE) {
     override val root: VBox by fxml()
     var started = false
     val playBotButton: Button by fxid()
-    val playMultiButton: Button by fxid()
-    val startServerButton: Button by fxid()
 
     init {
         main.startView = this
@@ -29,21 +27,6 @@ class StartView : View(VIEW_TITLE) {
             started = true
             changeRoot<GameView>()
             main.gameView.startWithPaneParam(main.gameView.root)
-        }
-        startServerButton.setOnAction {
-            if (started) {
-                return@setOnAction
-            }
-            started = true
-            changeRoot<LobbyView>()
-            main.lobbyView.reset()
-        }
-        playMultiButton.setOnAction {
-            if (started) {
-                return@setOnAction
-            }
-            started = true
-            changeRoot<JoinLobbyView>()
         }
     }
 }
