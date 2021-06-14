@@ -3,8 +3,10 @@ package me.dkim19375.tag
 import javafx.stage.Stage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import me.dkim19375.tag.util.SkinType
 import me.dkim19375.tag.view.GameEndView
 import me.dkim19375.tag.view.GameView
+import me.dkim19375.tag.view.SkinsView
 import me.dkim19375.tag.view.StartView
 import tornadofx.App
 import tornadofx.launch
@@ -28,6 +30,10 @@ class Tag : App(StartView::class) {
     lateinit var gameEndView: GameEndView
     lateinit var gameView: GameView
     lateinit var startView: StartView
+    lateinit var skinsView: SkinsView
+    var selectedSkin: SkinType = SkinType.DEFAULT
+    val owned = mutableSetOf<Int>()
+    var coins = 0
     var score = 0
 
     init {
