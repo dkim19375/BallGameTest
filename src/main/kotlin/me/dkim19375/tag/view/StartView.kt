@@ -9,7 +9,6 @@ import javafx.scene.paint.ImagePattern
 import javafx.scene.shape.Circle
 import me.dkim19375.tag.VIEW_TITLE
 import me.dkim19375.tag.main
-import me.dkim19375.tag.util.changeRoot
 import tornadofx.View
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -27,11 +26,11 @@ class StartView : View(VIEW_TITLE) {
 
     fun start() {
         playBotButton.setOnAction {
-            changeRoot<GameView>()
+            replaceWith<GameView>()
             main.gameView.startWithPaneParam(main.gameView.root)
         }
         skinsButton.setOnAction {
-            changeRoot<SkinsView>()
+            replaceWith<SkinsView>()
             main.skinsView.start()
         }
         updateCoinsLabel()

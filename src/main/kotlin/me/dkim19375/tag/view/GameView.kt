@@ -90,6 +90,7 @@ class GameView : View(VIEW_TITLE) {
     var lives = 5
     var coins = 0
     var enemyFrozen = false
+    var lastHit = 0L
 
     init {
         main.gameView = this
@@ -129,7 +130,7 @@ class GameView : View(VIEW_TITLE) {
                 if (!active) {
                     return@launch
                 }
-                if (gameStarted && !first) {
+                if (gameStarted && !first && !enemyFrozen) {
                     speed += 0.05
                     main.score++
                 }
@@ -233,6 +234,7 @@ class GameView : View(VIEW_TITLE) {
                 font = Font.font("System", 50.0)
                 alignment = Pos.CENTER
             }
+            tpsLabel.hide()
             topHBox = hbox {
                 alignment = Pos.CENTER
             }
@@ -304,6 +306,10 @@ class GameView : View(VIEW_TITLE) {
             stop()
             return
         }
+        if (System.currentTimeMillis() - lastHit <= 2500L) {
+            return
+        }
+        lastHit = System.currentTimeMillis()
         lives--
         Platform.runLater { livesLabel.text = "Lives: $lives" }
         SCOPE.launch {
