@@ -20,6 +20,7 @@ lateinit var THREAD: Thread
     private set
 
 fun main(args: Array<String>) {
+    System.setProperty("javafx.animation.fullspeed", "true")
     launch<TagGame>(*args)
 }
 

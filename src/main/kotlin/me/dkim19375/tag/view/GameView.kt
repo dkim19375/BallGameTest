@@ -46,7 +46,7 @@ import tornadofx.vbox
 import kotlin.math.min
 import kotlin.system.measureTimeMillis
 
-private const val TPS = 120.0
+private const val TPS = 500.0
 private val tickDiff: Double
     get() = 1000.0 / TPS
 private const val BASE_SPEED = 0.6
@@ -153,8 +153,10 @@ class GameView : View(VIEW_TITLE) {
                     return@launch
                 }
                 val off = measureTimeMillis {
-                    move()
-                    detectHit()
+                    runSync {
+                        move()
+                        detectHit()
+                    }
                 }
                 if ((off > tickDiff) && ((off - tickDiff) / tickDiff >= 10.0)) {
                     System.err.println("Running ${(off - tickDiff).toInt()}ms behind (${((off - tickDiff) / tickDiff).toInt()} ticks)!")
@@ -215,7 +217,9 @@ class GameView : View(VIEW_TITLE) {
             SCOPE.launch {
                 await { finished }
                 while (true) {
-                    updateTopVBox()
+                    runSync {
+                        updateTopVBox()
+                    }
                     delay(50L)
                 }
             }
@@ -235,7 +239,9 @@ class GameView : View(VIEW_TITLE) {
             SCOPE.launch {
                 await { finished }
                 while (true) {
-                    teleport(centerX - (width / 2), windowY - height - 100.0)
+                    runSync {
+                        teleport(centerX - (width / 2), windowY - height - 100.0)
+                    }
                     delay(50L)
                 }
             }
@@ -268,22 +274,16 @@ class GameView : View(VIEW_TITLE) {
 
     @Synchronized
     private fun move() {
-        try {
-            pressed.toSet()
-        } catch (_: ConcurrentModificationException) {
-            setOf()
-        }.forEach { type ->
-            val loc = user.getPoint(type, speed).setBounds(
-                maxX = windowX - user.radius * 1.5,
-                maxY = windowY - user.radius * 1.5,
-                minX = -(user.radius * 0.5),
-                minY = -(user.radius * 0.5)
-            )
-            user.teleport(loc)
-        }
+        val loc = user.getPoint(pressed, speed).setBounds(
+            maxX = windowX - user.radius * 1.5,
+            maxY = windowY - user.radius * 1.5,
+            minX = -(user.radius * 0.5),
+            minY = -(user.radius * 0.5)
+        )
+        user.teleport(loc)
         if (!enemyFrozen) {
             val enemyLoc = enemy.getLocation()
-            enemy.teleport(enemyLoc.getDirectionPoint(speed, enemyLoc.getAngle(user.getLocation())))
+            enemy.teleport(enemyLoc.getDirectionPoint(speed * 0.8, enemyLoc.getAngle(user.getLocation())))
         }
     }
 
@@ -324,5 +324,14 @@ class GameView : View(VIEW_TITLE) {
                 main.gameEndView.start(coins)
             }
         }
+    }
+
+    @Synchronized
+    private fun runSync(action: () -> Unit) {
+        if (!onMainThread()) {
+            Platform.runLater(action)
+            return
+        }
+        action()
     }
 }

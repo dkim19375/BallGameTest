@@ -4,6 +4,10 @@ import javafx.geometry.Point2D
 import javafx.scene.Node
 import javafx.scene.shape.Circle
 import me.dkim19375.tag.main
+import me.dkim19375.tag.util.KeyType.DOWN
+import me.dkim19375.tag.util.KeyType.LEFT
+import me.dkim19375.tag.util.KeyType.RIGHT
+import me.dkim19375.tag.util.KeyType.UP
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.max
@@ -78,14 +82,12 @@ fun Point2D.getDirectionPoint(distance: Float, angle: Float): Point2D {
     return Point2D(newX, newY)
 }
 
-fun Node.getPoint(direction: KeyType, amount: Double): Point2D {
+fun Node.getPoint(direction: KeyType, amount: Double): Point2D = getPoint(listOf(direction), amount)
+
+fun Node.getPoint(directions: Collection<KeyType>, amount: Double): Point2D {
     val loc = getLocation()
-    return when (direction) {
-        KeyType.UP -> loc.add(0.0, -amount)
-        KeyType.LEFT -> loc.add(-amount, 0.0)
-        KeyType.DOWN -> loc.add(0.0, amount)
-        KeyType.RIGHT -> loc.add(amount, 0.0)
-    }
+    val angle = directions.getDirection() ?: return loc
+    return loc.getDirectionPoint(amount, angle)
 }
 
 fun Node.teleport(loc: Point2D) = teleport(loc.x, loc.y)
@@ -94,3 +96,64 @@ fun Node.teleport(x: Int, y: Int) = teleport(x.toDouble(), y.toDouble())
 
 @Synchronized
 fun Node.teleport(x: Double, y: Double) = relocate(x, y)
+
+fun Collection<KeyType>.getDirection(): Double? {
+    val list = toSet().toList()
+    if (isEmpty()) {
+        return null
+    }
+    val first = list[0]
+    if (size == 1) {
+        return first.angle
+    }
+    val second = list[1]
+    if (size >= 4) {
+        return null
+    }
+    if (size == 2) {
+        when (first) {
+            UP -> {
+                return when (second) {
+                    UP -> UP.angle
+                    LEFT -> UP.angle - 45.0
+                    DOWN -> null
+                    RIGHT -> UP.angle + 45.0
+                }
+            }
+            LEFT -> {
+                return when (second) {
+                    UP -> LEFT.angle + 45.0
+                    LEFT -> LEFT.angle
+                    DOWN -> LEFT.angle - 45.0
+                    RIGHT -> null
+                }
+            }
+            DOWN -> {
+                return when (second) {
+                    UP -> null
+                    LEFT -> DOWN.angle + 45.0
+                    DOWN -> DOWN.angle
+                    RIGHT -> DOWN.angle - 45.0
+                }
+            }
+            RIGHT -> {
+                return when (second) {
+                    UP -> RIGHT.angle - 45.0
+                    LEFT -> null
+                    DOWN -> 45.0
+                    RIGHT -> RIGHT.angle
+                }
+            }
+        }
+    }
+    val third = list[2]
+    if (size != 3) {
+        return null
+    }
+    return when {
+        listOf(first, second).getDirection() == null -> third.angle
+        listOf(first, third).getDirection() == null -> second.angle
+        listOf(second, third).getDirection() == null -> first.angle
+        else -> null
+    }
+}
