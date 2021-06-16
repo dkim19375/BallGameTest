@@ -46,9 +46,10 @@ import tornadofx.vbox
 import kotlin.math.min
 import kotlin.system.measureTimeMillis
 
-private const val TPS = 500.0
+private const val TPS = 120.0
 private val tickDiff: Double
     get() = 1000.0 / TPS
+private const val BASE_SPEED = 0.6
 
 @Suppress("MemberVisibilityCanBePrivate")
 class GameView : View(VIEW_TITLE) {
@@ -86,7 +87,7 @@ class GameView : View(VIEW_TITLE) {
     var latestTPS = TPS.toInt()
     var gameStarted = false
     var pressed = mutableSetOf<KeyType>()
-    var speed = 0.7
+    var speed = BASE_SPEED * (500.0 / TPS)
     var lives = 5
     var coins = 0
     var enemyFrozen = false
@@ -100,7 +101,8 @@ class GameView : View(VIEW_TITLE) {
         active = false
         gameStarted = false
         pressed = mutableSetOf()
-        speed = 0.7
+        speed = BASE_SPEED * (500.0 / TPS)
+        println("speed: $speed")
         main.score = 0
         lives = 5
         coins = 0
@@ -131,7 +133,7 @@ class GameView : View(VIEW_TITLE) {
                     return@launch
                 }
                 if (gameStarted && !first && !enemyFrozen) {
-                    speed += 0.05
+                    speed += 0.05 * (500.0 / TPS)
                     main.score++
                 }
                 Platform.runLater {
@@ -282,7 +284,7 @@ class GameView : View(VIEW_TITLE) {
         }
         if (!enemyFrozen) {
             val enemyLoc = enemy.getLocation()
-            enemy.teleport(enemyLoc.getDirectionPoint(speed * 0.8, enemyLoc.getAngle(user.getLocation())))
+            enemy.teleport(enemyLoc.getDirectionPoint(speed, enemyLoc.getAngle(user.getLocation())))
         }
     }
 
