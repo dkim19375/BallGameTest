@@ -14,7 +14,7 @@ import javafx.scene.shape.Circle
 import javafx.scene.text.Font
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import me.dkim19375.tag.SCOPE
+import me.dkim19375.dkimcore.extension.SCOPE
 import me.dkim19375.tag.VIEW_TITLE
 import me.dkim19375.tag.main
 import me.dkim19375.tag.util.KeyType
@@ -55,10 +55,10 @@ class GameView : View(VIEW_TITLE) {
     override val root: Pane = pane {
         keyboard {
             addEventHandler(KeyEvent.KEY_PRESSED) { event ->
-                pressed.add(getCharFromEvent(event) ?: return@addEventHandler)
+                pressed.add(event.text.toKeyType() ?: return@addEventHandler)
             }
             addEventHandler(KeyEvent.KEY_RELEASED) { event ->
-                pressed.remove(getCharFromEvent(event) ?: return@addEventHandler)
+                pressed.remove(event.text.toKeyType() ?: return@addEventHandler)
             }
         }
     }
@@ -181,18 +181,6 @@ class GameView : View(VIEW_TITLE) {
         }
     }
 
-    private fun getCharFromEvent(event: KeyEvent): KeyType? {
-        val char = try {
-            if (event.text.length > 1) {
-                throw IndexOutOfBoundsException()
-            }
-            event.text[0]
-        } catch (_: IndexOutOfBoundsException) {
-            return null
-        }
-        return char.toKeyType()
-    }
-
     private fun Pane.setupUserBall() {
         if (this@GameView::user.isInitialized) {
             user.fill = if (main.selectedSkin == SkinType.DEFAULT) {
@@ -279,7 +267,11 @@ class GameView : View(VIEW_TITLE) {
 
     @Synchronized
     private fun move() {
-        pressed.toSet().forEach { type ->
+        try {
+            pressed.toSet()
+        } catch (_: ConcurrentModificationException) {
+            setOf()
+        }.forEach { type ->
             val loc = user.getPoint(type, speed).setBounds(
                 maxX = windowX - user.radius * 1.5,
                 maxY = windowY - user.radius * 1.5,
@@ -290,7 +282,7 @@ class GameView : View(VIEW_TITLE) {
         }
         if (!enemyFrozen) {
             val enemyLoc = enemy.getLocation()
-            enemy.teleport(enemyLoc.getDirectionPoint(speed * 0.97, enemyLoc.getAngle(user.getLocation())))
+            enemy.teleport(enemyLoc.getDirectionPoint(speed * 0.8, enemyLoc.getAngle(user.getLocation())))
         }
     }
 

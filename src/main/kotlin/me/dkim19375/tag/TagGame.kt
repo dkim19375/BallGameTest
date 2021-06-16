@@ -1,39 +1,54 @@
 package me.dkim19375.tag
 
 import javafx.stage.Stage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import me.dkim19375.tag.file.DataFile
+import me.dkim19375.tag.file.Profile
 import me.dkim19375.tag.util.SkinType
 import me.dkim19375.tag.view.GameEndView
 import me.dkim19375.tag.view.GameView
+import me.dkim19375.tag.view.ProfileView
 import me.dkim19375.tag.view.SkinsView
 import me.dkim19375.tag.view.StartView
 import tornadofx.App
 import tornadofx.launch
 import kotlin.system.exitProcess
 
-lateinit var main: Tag
+lateinit var main: TagGame
     private set
-val SCOPE: CoroutineScope = CoroutineScope(Dispatchers.Default)
 const val VIEW_TITLE = "Tag Game"
 lateinit var THREAD: Thread
     private set
 
 fun main(args: Array<String>) {
-    launch<Tag>(*args)
+    launch<TagGame>(*args)
 }
 
 @Suppress("MemberVisibilityCanBePrivate")
-class Tag : App(StartView::class) {
+class TagGame : App(StartView::class) {
+    val dataFile: DataFile = DataFile()
     lateinit var stage: Stage
         private set
     lateinit var gameEndView: GameEndView
     lateinit var gameView: GameView
     lateinit var startView: StartView
     lateinit var skinsView: SkinsView
-    var selectedSkin: SkinType = SkinType.DEFAULT
-    val owned = mutableSetOf<Int>()
-    var coins = 0
+    lateinit var profileView: ProfileView
+    private var first = true
+    val profile: Profile
+        get() = run {
+            val profile = dataFile.getCurrentProfile(first)
+            first = false
+            profile
+        }
+    var selectedSkin: SkinType
+        get() = profile.selectedSkin
+        set(value) = run { profile.setSelectedSkin(value) }
+    var owned: Set<SkinType>
+        get() = profile.skins
+        set(value) = run { profile.setSkins(value, this@TagGame) }
+    var coins: Int
+        get() = profile.coins
+        set(value) = run { profile.setCoins(value, this@TagGame) }
     var score = 0
 
     init {

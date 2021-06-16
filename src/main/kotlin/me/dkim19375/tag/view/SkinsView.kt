@@ -11,7 +11,7 @@ import javafx.scene.paint.Paint
 import javafx.scene.shape.Circle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import me.dkim19375.tag.SCOPE
+import me.dkim19375.dkimcore.extension.SCOPE
 import me.dkim19375.tag.VIEW_TITLE
 import me.dkim19375.tag.main
 import me.dkim19375.tag.util.SkinType
@@ -73,7 +73,7 @@ class SkinsView : View(VIEW_TITLE) {
                 if (event.button != MouseButton.PRIMARY) {
                     return@setOnMouseClicked
                 }
-                if (main.owned.contains(number)) {
+                if (main.owned.contains(type)) {
                     main.selectedSkin = type
                     main.startView.updateSelectedCircle()
                     setupItems()
@@ -91,12 +91,14 @@ class SkinsView : View(VIEW_TITLE) {
                 main.selectedSkin = type
                 main.startView.updateSelectedCircle()
                 setupItems()
-                main.owned.add(number)
+                val new = main.owned.toMutableSet()
+                new.add(type)
+                main.owned = new
                 setupItem(circle, type)
                 showSelectedColor(circle)
             }
         }
-        if (!main.owned.contains(number)) {
+        if (!main.owned.contains(type)) {
             return
         }
         circle.fill = ImagePattern(

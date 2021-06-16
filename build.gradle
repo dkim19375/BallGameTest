@@ -27,17 +27,24 @@ javafx {
     modules = ['javafx.base', 'javafx.controls', 'javafx.graphics', 'javafx.fxml']
 }
 
-java {
-    modularity.inferModulePath = true
-}
-
 repositories {
-    mavenCentral()
+    mavenCentral {
+        content {
+            excludeGroup 'io.github.dkim19375'
+        }
+    }
+    maven { url = 'https://repo.mattstudios.me/artifactory/public' }
+    maven { url = 'https://s01.oss.sonatype.org/content/repositories/releases/' }
+    maven { url = 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
 }
 
 dependencies {
     compileOnly 'org.jetbrains:annotations:+'
-    implementation 'commons-io:commons-io:2.8.0'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
     implementation 'no.tornado:tornadofx:1.7.20'
+    implementation 'commons-io:commons-io:2.8.0'
+    implementation 'io.github.dkim19375:dkimcore:+'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
+    implementation 'com.ToxicBakery.library.bcrypt:bcrypt:+'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
 }

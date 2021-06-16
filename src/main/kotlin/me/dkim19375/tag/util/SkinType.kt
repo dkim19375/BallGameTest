@@ -19,5 +19,7 @@ enum class SkinType(
             list.remove(DEFAULT)
             return list.toTypedArray()
         }
+
+        fun getFromInt(int: Int): SkinType? = values().firstOrNull { it.intValue == int }
     }
 }

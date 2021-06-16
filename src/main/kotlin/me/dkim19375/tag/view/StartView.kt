@@ -11,20 +11,20 @@ import me.dkim19375.tag.VIEW_TITLE
 import me.dkim19375.tag.main
 import tornadofx.View
 
-@Suppress("MemberVisibilityCanBePrivate")
 class StartView : View(VIEW_TITLE) {
     override val root: VBox by fxml()
-    val playBotButton: Button by fxid()
-    val skinsButton: Button by fxid()
-    val skinCircle: Circle by fxid()
-    val coinsLabel: Label by fxid()
+    private val playBotButton: Button by fxid()
+    private val skinsButton: Button by fxid()
+    private val skinCircle: Circle by fxid()
+    private val coinsLabel: Label by fxid()
+    private val profileButton: Button by fxid()
 
     init {
         main.startView = this
         start()
     }
 
-    fun start() {
+    private fun start() {
         playBotButton.setOnAction {
             replaceWith<GameView>()
             main.gameView.startWithPaneParam(main.gameView.root)
@@ -33,8 +33,13 @@ class StartView : View(VIEW_TITLE) {
             replaceWith<SkinsView>()
             main.skinsView.start()
         }
+        profileButton.setOnAction {
+            replaceWith<ProfileView>()
+            main.profileView.start()
+        }
         updateCoinsLabel()
         updateSelectedCircle()
+        updateProfileButton()
     }
 
     fun updateSelectedCircle() {
@@ -47,5 +52,9 @@ class StartView : View(VIEW_TITLE) {
 
     fun updateCoinsLabel() {
         coinsLabel.text = "Coins: ${main.coins}"
+    }
+
+    fun updateProfileButton() {
+        profileButton.text = "Profile: ${main.profile.name}"
     }
 }

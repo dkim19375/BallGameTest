@@ -81,10 +81,10 @@ fun Point2D.getDirectionPoint(distance: Float, angle: Float): Point2D {
 fun Node.getPoint(direction: KeyType, amount: Double): Point2D {
     val loc = getLocation()
     return when (direction) {
-        KeyType.W -> loc.add(0.0, -amount)
-        KeyType.A -> loc.add(-amount, 0.0)
-        KeyType.S -> loc.add(0.0, amount)
-        KeyType.D -> loc.add(amount, 0.0)
+        KeyType.UP -> loc.add(0.0, -amount)
+        KeyType.LEFT -> loc.add(-amount, 0.0)
+        KeyType.DOWN -> loc.add(0.0, amount)
+        KeyType.RIGHT -> loc.add(amount, 0.0)
     }
 }
 
@@ -92,4 +92,5 @@ fun Node.teleport(loc: Point2D) = teleport(loc.x, loc.y)
 
 fun Node.teleport(x: Int, y: Int) = teleport(x.toDouble(), y.toDouble())
 
+@Synchronized
 fun Node.teleport(x: Double, y: Double) = relocate(x, y)
