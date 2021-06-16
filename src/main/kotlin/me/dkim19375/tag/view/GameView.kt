@@ -102,7 +102,6 @@ class GameView : View(VIEW_TITLE) {
         gameStarted = false
         pressed = mutableSetOf()
         speed = BASE_SPEED * (500.0 / TPS)
-        println("speed: $speed")
         main.score = 0
         lives = 5
         coins = 0
