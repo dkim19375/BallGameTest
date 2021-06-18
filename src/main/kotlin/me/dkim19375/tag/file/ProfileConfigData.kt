@@ -4,7 +4,7 @@ import javafx.scene.image.Image
 import javafx.scene.paint.ImagePattern
 import me.dkim19375.dkimcore.extension.runCatchingOrNull
 import me.dkim19375.tag.util.Hash
-import me.dkim19375.tag.util.SkinType
+import me.dkim19375.tag.enumclass.SkinType
 
 data class ProfileConfigData(
     var name: String = "Public",

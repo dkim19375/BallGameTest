@@ -10,6 +10,7 @@ import javafx.scene.media.Media
 import javafx.scene.media.MediaPlayer
 import kotlinx.coroutines.launch
 import me.dkim19375.dkimcore.extension.SCOPE
+import me.dkim19375.tag.enumclass.Sounds
 import me.dkim19375.tag.main
 
 fun playSoundEffect(sound: String, volume: Double = 1.0) {

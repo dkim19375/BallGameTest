@@ -4,8 +4,9 @@ import javafx.stage.Stage
 import me.dkim19375.tag.file.DataFile
 import me.dkim19375.tag.file.Profile
 import me.dkim19375.tag.manager.GameManager
-import me.dkim19375.tag.util.SkinType
+import me.dkim19375.tag.enumclass.SkinType
 import me.dkim19375.tag.view.*
+import me.dkim19375.tag.view.skin.SkinsView1
 import tornadofx.App
 import tornadofx.launch
 import kotlin.system.exitProcess
@@ -28,7 +29,7 @@ class TagGame : App(StartView::class) {
     lateinit var gameEndView: GameEndView
     lateinit var gameView: GameView
     lateinit var startView: StartView
-    lateinit var skinsView: SkinsView
+    lateinit var skinsView1: SkinsView1
     lateinit var profileView: ProfileView
     lateinit var createAccountView: CreateAccountView
     val gameManager: GameManager = GameManager(this)

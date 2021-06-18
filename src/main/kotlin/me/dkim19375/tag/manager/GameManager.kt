@@ -8,6 +8,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.dkim19375.dkimcore.extension.SCOPE
 import me.dkim19375.tag.TagGame
+import me.dkim19375.tag.enumclass.KeyType
+import me.dkim19375.tag.enumclass.Sounds
+import me.dkim19375.tag.enumclass.toKeyType
 import me.dkim19375.tag.util.*
 import me.dkim19375.tag.view.GameEndView
 import me.dkim19375.tag.view.GameView

@@ -1,4 +1,4 @@
-package me.dkim19375.tag.util
+package me.dkim19375.tag.enumclass
 
 import javafx.scene.image.Image
 import javafx.scene.paint.Color

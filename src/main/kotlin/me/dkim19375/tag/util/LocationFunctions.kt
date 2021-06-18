@@ -3,11 +3,12 @@ package me.dkim19375.tag.util
 import javafx.geometry.Point2D
 import javafx.scene.Node
 import javafx.scene.shape.Circle
+import me.dkim19375.tag.enumclass.KeyType
 import me.dkim19375.tag.main
-import me.dkim19375.tag.util.KeyType.DOWN
-import me.dkim19375.tag.util.KeyType.LEFT
-import me.dkim19375.tag.util.KeyType.RIGHT
-import me.dkim19375.tag.util.KeyType.UP
+import me.dkim19375.tag.enumclass.KeyType.DOWN
+import me.dkim19375.tag.enumclass.KeyType.LEFT
+import me.dkim19375.tag.enumclass.KeyType.RIGHT
+import me.dkim19375.tag.enumclass.KeyType.UP
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.max

@@ -8,6 +8,7 @@ import me.dkim19375.tag.main
 import me.dkim19375.tag.util.VIEW_TITLE
 import me.dkim19375.tag.util.applyBackgroundSettings
 import me.dkim19375.tag.util.setOnPress
+import me.dkim19375.tag.view.skin.SkinsView1
 import tornadofx.View
 
 class StartView : View(VIEW_TITLE) {
@@ -31,8 +32,8 @@ class StartView : View(VIEW_TITLE) {
             main.gameManager.start()
         }
         skinsButton.setOnPress {
-            replaceWith<SkinsView>()
-            main.skinsView.start()
+            replaceWith<SkinsView1>()
+            main.skinsView1.start()
         }
         profileButton.setOnPress {
             replaceWith<ProfileView>()

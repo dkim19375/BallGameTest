@@ -1,84 +1,71 @@
-package me.dkim19375.tag.view
+package me.dkim19375.tag.abstract
 
+import javafx.application.Platform
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.image.Image
 import javafx.scene.input.MouseButton
-import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.scene.paint.ImagePattern
 import javafx.scene.paint.Paint
 import javafx.scene.shape.Circle
-import javafx.stage.FileChooser
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.dkim19375.dkimcore.extension.SCOPE
+import me.dkim19375.tag.enumclass.SkinType
 import me.dkim19375.tag.main
-import me.dkim19375.tag.util.SkinType
 import me.dkim19375.tag.util.VIEW_TITLE
 import me.dkim19375.tag.util.applyBackgroundSettings
 import me.dkim19375.tag.util.setOnPress
-import tornadofx.View
-import tornadofx.hide
-import tornadofx.show
+import me.dkim19375.tag.view.StartView
+import tornadofx.*
+import kotlin.reflect.KClass
 
-class SkinsView : View(VIEW_TITLE) {
-    override val root: VBox by fxml()
-    private val setup = mutableSetOf<Int>()
-    private val uploadHBox: HBox by fxid()
-    private val uploadButton: Button by fxid()
-    private val customImage: Circle by fxid()
-    private val image0: Circle by fxid()
-    private val image1: Circle by fxid()
-    private val image2: Circle by fxid()
-    private val image3: Circle by fxid()
-    private val image4: Circle by fxid()
-    private val image5: Circle by fxid()
-    private val image6: Circle by fxid()
-    private val customCostLabel: Label by fxid()
-    private val costLabel0: Label by fxid()
-    private val costLabel1: Label by fxid()
-    private val costLabel2: Label by fxid()
-    private val costLabel3: Label by fxid()
-    private val costLabel4: Label by fxid()
-    private val costLabel5: Label by fxid()
-    private val costLabel6: Label by fxid()
-    private val backButton: Button by fxid()
+@Suppress("LeakingThis", "UNCHECKED_CAST")
+abstract class SkinsViewAbstract : View(VIEW_TITLE) {
+    override val root: VBox by fxml("/${javaClass.name.replace('.', '/')}.fxml")
     private val coinsLabel: Label by fxid()
-    private val circles = listOf(image0, image1, image2, image3, image4, image5, image6, customImage)
-    private val costs =
-        listOf(costLabel0, costLabel1, costLabel2, costLabel3, costLabel4, costLabel5, costLabel6, customCostLabel)
+    private val setup = mutableSetOf<Int>()
+    protected abstract val circles: List<Circle>
+    protected abstract val costs: List<Label>
+    protected abstract val firstItem: Int
+    protected open val previousButton: Button? = null
+    protected open val nextButton: Button? = null
+    protected abstract val backButton: Button
+    private val current = javaClass.simpleName[9].toString().toInt()
 
     init {
-        main.skinsView = this
-        backButton.setOnPress {
-            replaceWith<StartView>()
-        }
-        updateUploadButton()
-        uploadButton.setOnPress {
-            uploadButton.run {
-                if (!isVisible) {
-                    return@setOnPress
-                }
-                val chooser = FileChooser()
-                chooser.title = "Select Custom Image"
-                chooser.extensionFilters.clear()
-                chooser.extensionFilters.add(
-                    FileChooser.ExtensionFilter("Image files", "*.jpeg", "*.jpg", "*.png")
-                )
-                val file = chooser.showOpenDialog(main.stage) ?: return@setOnPress
-                main.dataFile.getCurrentProfile().setCustomSkin(file.absolutePath)
-                setupItems()
-                main.startView.updateSelectedCircle()
+        Platform.runLater {
+            backButton.setOnPress {
+                replaceWith<StartView>()
             }
+            previousButton?.setOnAction {
+                onChangeButton(-1)
+            }
+            nextButton?.setOnAction {
+                onChangeButton(1)
+            }
+            onStart()
+            setupItems()
         }
     }
 
-    fun start() {
+    private fun onChangeButton(change: Int) {
+        replaceWith(
+            Class.forName(
+                javaClass.name.replace(
+                    current.toString()[0],
+                    (current + change).toString()[0]
+                )
+            ).kotlin as KClass<out UIComponent>
+        )
+    }
+
+    open fun start() {
         root.applyBackgroundSettings()
+        onUpdate()
         updateCoinsLabel()
-        updateUploadButton()
         setupItems()
     }
 
@@ -86,33 +73,23 @@ class SkinsView : View(VIEW_TITLE) {
         coinsLabel.text = "Coins: ${main.coins}"
     }
 
-    private fun updateUploadButton() {
-        if (!main.owned.contains(SkinType.CUSTOM)) {
-            uploadButton.hide()
-            uploadHBox.hide()
-            return
-        }
-        uploadButton.show()
-        uploadHBox.show()
-    }
-
     private fun setupItems() {
         for (type in SkinType.values()) {
-            val circle = circles[type.intValue]
+            val circle = circles[type.intValue - firstItem]
             setupItem(circle, type)
         }
     }
 
     private fun setupItem(circle: Circle, type: SkinType) {
-        val number = type.intValue
+        val number = type.intValue - firstItem
         val paint = type.image
         val cost = type.cost
         val isDefault = type == SkinType.DEFAULT
         if (!isDefault) {
             circle.fill = ImagePattern(Image("images/${if (type == SkinType.CUSTOM) "custom_" else ""}lock.png"))
         }
-        costs[type.intValue].text = if (isDefault) "Free!" else "Cost: $cost Coins"
-        costs[type.intValue].textFill = if (cost > main.coins) Color.RED else Color.DARKGREEN
+        costs[number].text = if (isDefault) "Free!" else "Cost: $cost Coins"
+        costs[number].textFill = if (cost > main.coins) Color.RED else Color.DARKGREEN
         if (!setup.contains(number)) {
             setup.add(number)
             circle.setOnMouseClicked { event ->
@@ -124,11 +101,13 @@ class SkinsView : View(VIEW_TITLE) {
                     main.startView.updateSelectedCircle()
                     setupItems()
                     showSelectedColor(circle)
+                    onUpdate()
                     return@setOnMouseClicked
                 }
                 // buying
                 if (cost > main.coins) {
                     showSelectedColor(circle, Color.RED)
+                    onUpdate()
                     return@setOnMouseClicked
                 }
                 main.coins -= cost
@@ -142,7 +121,7 @@ class SkinsView : View(VIEW_TITLE) {
                 main.owned = new
                 setupItem(circle, type)
                 showSelectedColor(circle)
-                updateUploadButton()
+                onUpdate()
             }
         }
         if (!main.owned.contains(type) && !isDefault) {
@@ -150,6 +129,10 @@ class SkinsView : View(VIEW_TITLE) {
         }
         circle.fill = paint()
     }
+
+    protected open fun onUpdate() {}
+
+    protected open fun onStart() {}
 
     private fun showSelectedColor(circle: Circle, color: Paint = Color.LIME) {
         circle.strokeWidth = 5.0

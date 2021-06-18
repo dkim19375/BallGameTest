@@ -1,7 +1,7 @@
-package me.dkim19375.tag.util
+package me.dkim19375.tag.enumclass
 
 import javafx.scene.input.KeyCode
-import me.dkim19375.tag.util.KeyType.*
+import me.dkim19375.tag.enumclass.KeyType.*
 
 enum class KeyType(val angle: Double) {
     UP(270.0),
