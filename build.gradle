@@ -40,7 +40,6 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.jetbrains:annotations:+'
     implementation 'no.tornado:tornadofx:1.7.20'
     implementation 'commons-io:commons-io:2.8.0'
     implementation 'io.github.dkim19375:dkimcore:+'

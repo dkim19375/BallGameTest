@@ -13,6 +13,7 @@ import me.dkim19375.tag.view.GameEndView
 import me.dkim19375.tag.view.GameView
 import tornadofx.hide
 import tornadofx.show
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
 import kotlin.random.nextInt
@@ -172,9 +173,15 @@ class GameManager(private val main: TagGame) {
                 Random.nextInt(min..(windowX - max).toInt()).toDouble(),
                 Random.nextInt(min..(windowY - max).toInt()).toDouble()
             )
-            if (point.distance(loc) > 200) {
-                break
+            val distanceX = windowX / 3
+            val distanceY = windowY / 3
+            if (max(point.x, loc.x) - min(point.x, loc.x) > distanceX) {
+                continue
             }
+            if (max(point.y, loc.y) - min(point.y, loc.y) > distanceY) {
+                continue
+            }
+            break
         }
         coin.teleport(point)
     }
@@ -209,7 +216,7 @@ class GameManager(private val main: TagGame) {
         }
     }
 
-    fun stop() {
+    private fun stop() {
         gameView.stop()
         active = false
         main.coins += coins
@@ -229,11 +236,11 @@ class GameManager(private val main: TagGame) {
         }
     }
 
-    fun onKeyPressed(key: KeyCode) {
-        pressed.add(key.toKeyType() ?: return)
+    fun onKeyPressed(key: KeyCode) = runSync {
+        pressed.add(key.toKeyType() ?: return@runSync)
     }
 
-    fun onKeyReleased(key: KeyCode) {
-        pressed.remove(key.toKeyType() ?: return)
+    fun onKeyReleased(key: KeyCode) = runSync {
+        pressed.remove(key.toKeyType() ?: return@runSync)
     }
 }
