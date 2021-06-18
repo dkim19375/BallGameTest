@@ -2,13 +2,12 @@ package me.dkim19375.tag.view
 
 import javafx.scene.control.Button
 import javafx.scene.control.Label
-import javafx.scene.image.Image
 import javafx.scene.layout.VBox
-import javafx.scene.paint.Color
-import javafx.scene.paint.ImagePattern
 import javafx.scene.shape.Circle
-import me.dkim19375.tag.VIEW_TITLE
 import me.dkim19375.tag.main
+import me.dkim19375.tag.util.VIEW_TITLE
+import me.dkim19375.tag.util.applyBackgroundSettings
+import me.dkim19375.tag.util.setOnPress
 import tornadofx.View
 
 class StartView : View(VIEW_TITLE) {
@@ -18,6 +17,7 @@ class StartView : View(VIEW_TITLE) {
     private val skinCircle: Circle by fxid()
     private val coinsLabel: Label by fxid()
     private val profileButton: Button by fxid()
+    private val highscoreLabel: Label by fxid()
 
     init {
         main.startView = this
@@ -25,29 +25,31 @@ class StartView : View(VIEW_TITLE) {
     }
 
     private fun start() {
-        playBotButton.setOnAction {
+        root.applyBackgroundSettings()
+        playBotButton.setOnPress {
             replaceWith<GameView>()
-            main.gameView.startWithPaneParam(main.gameView.root)
+            main.gameManager.start()
         }
-        skinsButton.setOnAction {
+        skinsButton.setOnPress {
             replaceWith<SkinsView>()
             main.skinsView.start()
         }
-        profileButton.setOnAction {
+        profileButton.setOnPress {
             replaceWith<ProfileView>()
             main.profileView.start()
         }
         updateCoinsLabel()
         updateSelectedCircle()
         updateProfileButton()
+        updateHighscoreLabel()
+    }
+
+    fun updateHighscoreLabel() {
+        highscoreLabel.text = "Highscore: ${main.profile.highscore}"
     }
 
     fun updateSelectedCircle() {
-        skinCircle.fill = try {
-            ImagePattern(Image("images/skins/${main.selectedSkin.intValue}.png"))
-        } catch (_: IllegalArgumentException) {
-            Color.BLACK
-        }
+        skinCircle.fill = main.selectedSkin.image()
     }
 
     fun updateCoinsLabel() {

@@ -30,7 +30,7 @@ inline fun <reified T : View> changeRoot() {
     throw IllegalStateException("No views are initialized!")
 }
 
-inline fun <T : View, reified C : View> KProperty0<T>.changeView() : Boolean {
+inline fun <T : View, reified C : View> KProperty0<T>.changeView(): Boolean {
     if (!isInit()) {
         return false
     }
@@ -50,3 +50,12 @@ inline fun <T : View, reified C : View> KProperty0<T>.changeView() : Boolean {
 }
 
 fun onMainThread(): Boolean = Thread.currentThread().id == THREAD.id
+
+@Synchronized
+fun runSync(action: () -> Unit) {
+    if (!onMainThread()) {
+        Platform.runLater(action)
+        return
+    }
+    action()
+}

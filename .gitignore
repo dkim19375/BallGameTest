@@ -1,7 +1,8 @@
 # Project exclude paths
 /.gradle/
 /build/
-/.idea
+/.idea/
+/.scripts/
 
 # Used for testing stuff
 /src/main/resources/test.fxml

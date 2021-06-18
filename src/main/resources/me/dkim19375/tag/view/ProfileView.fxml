@@ -4,12 +4,12 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="500.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<!--suppress ALL -->
+<VBox alignment="CENTER" prefHeight="553.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
          <children>
@@ -35,39 +35,48 @@
             <PasswordField fx:id="passwordField" prefHeight="23.0" prefWidth="243.0" />
          </children>
       </HBox>
-      <HBox alignment="CENTER" prefHeight="62.0" prefWidth="820.0">
-         <children>
-            <Label prefHeight="27.0" prefWidth="144.0" text="Create a profile:">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-            <TextField fx:id="createField" prefHeight="31.0" prefWidth="193.0" />
-         </children>
-      </HBox>
       <HBox alignment="CENTER" prefHeight="64.0" prefWidth="820.0">
          <children>
-            <Button fx:id="createButton" mnemonicParsing="false" prefHeight="52.0" prefWidth="206.0" text="Create Profile">
-               <font>
-                  <Font size="18.0" />
-               </font></Button>
+            <HBox alignment="CENTER" prefWidth="250.0">
+               <children>
+                  <Button fx:id="createButton" mnemonicParsing="false" prefHeight="52.0" prefWidth="206.0" text="Create Profile">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefWidth="250.0">
+               <children>
+                  <Button fx:id="deleteButton" mnemonicParsing="false" prefHeight="52.0" prefWidth="206.0" text="Delete Profile">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
          </children>
       </HBox>
-      <HBox alignment="CENTER" prefHeight="86.0" prefWidth="820.0">
+      <HBox alignment="BOTTOM_CENTER" prefHeight="58.0" prefWidth="820.0">
          <children>
-            <Button fx:id="deleteButton" mnemonicParsing="false" prefHeight="52.0" prefWidth="206.0" text="Delete Profile">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Button>
-         </children>
-      </HBox>
-      <HBox alignment="BOTTOM_CENTER" prefHeight="67.0" prefWidth="820.0">
-         <children>
-            <Button fx:id="backButton" mnemonicParsing="false" prefHeight="52.0" prefWidth="206.0" text="Back">
-               <font>
-                  <Font size="20.0" />
-               </font></Button>
+            <HBox alignment="CENTER" prefWidth="250.0">
+               <children>
+                  <Button fx:id="backButton" alignment="CENTER" mnemonicParsing="false" prefHeight="52.0" prefWidth="206.0" text="Back">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefWidth="250.0">
+               <children>
+                  <Button fx:id="selectButton" alignment="CENTER" mnemonicParsing="false" prefHeight="52.0" prefWidth="206.0" text="Select">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
          </children>
       </HBox>
       <HBox alignment="CENTER" prefHeight="67.0" prefWidth="820.0">

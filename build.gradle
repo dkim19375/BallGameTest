@@ -4,6 +4,7 @@ plugins {
     id 'org.openjfx.javafxplugin' version '0.0.9'
     id 'org.jetbrains.kotlin.jvm' version '1.5.10'
     id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'org.mikeneck.graalvm-native-image' version 'v1.4.1'
 }
 
 mainClassName = 'me.dkim19375.tag.TagGameKt'
@@ -24,7 +25,7 @@ application {
 }
 
 javafx {
-    modules = ['javafx.base', 'javafx.controls', 'javafx.graphics', 'javafx.fxml']
+    modules = ['javafx.base', 'javafx.controls', 'javafx.graphics', 'javafx.fxml', 'javafx.media' ]
 }
 
 repositories {
@@ -47,4 +48,14 @@ dependencies {
     implementation 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
     implementation 'com.ToxicBakery.library.bcrypt:bcrypt:+'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
+}
+
+nativeImage {
+    graalVmHome = System.getProperty 'java.home'
+    mainClass = mainClassName
+    executableName = 'TagEXE'
+    outputDirectory = file "$buildDir/libs/exe"
+}
+generateNativeImageConfig {
+    enabled = true
 }

@@ -7,6 +7,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
+<!--suppress ALL -->
 <VBox alignment="CENTER" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox alignment="CENTER" prefHeight="173.0" prefWidth="958.0">
@@ -53,6 +54,15 @@
       <HBox alignment="BOTTOM_CENTER" prefHeight="104.0" prefWidth="958.0">
          <children>
             <Label fx:id="coinsLabel" alignment="TOP_RIGHT" prefHeight="54.0" text="Coins: 0">
+               <font>
+                  <Font size="30.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" prefHeight="52.0" prefWidth="958.0">
+         <children>
+            <Label fx:id="highscoreLabel" alignment="TOP_RIGHT" prefHeight="54.0" text="Highscore: 0">
                <font>
                   <Font size="30.0" />
                </font>

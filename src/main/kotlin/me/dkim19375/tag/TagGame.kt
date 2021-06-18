@@ -3,19 +3,15 @@ package me.dkim19375.tag
 import javafx.stage.Stage
 import me.dkim19375.tag.file.DataFile
 import me.dkim19375.tag.file.Profile
+import me.dkim19375.tag.manager.GameManager
 import me.dkim19375.tag.util.SkinType
-import me.dkim19375.tag.view.GameEndView
-import me.dkim19375.tag.view.GameView
-import me.dkim19375.tag.view.ProfileView
-import me.dkim19375.tag.view.SkinsView
-import me.dkim19375.tag.view.StartView
+import me.dkim19375.tag.view.*
 import tornadofx.App
 import tornadofx.launch
 import kotlin.system.exitProcess
 
 lateinit var main: TagGame
     private set
-const val VIEW_TITLE = "Tag Game"
 lateinit var THREAD: Thread
     private set
 
@@ -34,6 +30,8 @@ class TagGame : App(StartView::class) {
     lateinit var startView: StartView
     lateinit var skinsView: SkinsView
     lateinit var profileView: ProfileView
+    lateinit var createAccountView: CreateAccountView
+    val gameManager: GameManager = GameManager(this)
     private var first = true
     val profile: Profile
         get() = run {

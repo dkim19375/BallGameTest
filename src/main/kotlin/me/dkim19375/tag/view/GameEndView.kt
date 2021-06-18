@@ -4,9 +4,11 @@ import javafx.application.Platform
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.layout.VBox
-import me.dkim19375.tag.VIEW_TITLE
 import me.dkim19375.tag.main
+import me.dkim19375.tag.util.VIEW_TITLE
+import me.dkim19375.tag.util.applyBackgroundSettings
 import me.dkim19375.tag.util.onMainThread
+import me.dkim19375.tag.util.setOnPress
 import tornadofx.View
 
 class GameEndView : View(VIEW_TITLE) {
@@ -15,26 +17,33 @@ class GameEndView : View(VIEW_TITLE) {
     private val playAgainButton: Button by fxid()
     private val homeButton: Button by fxid()
     private val coins: Label by fxid()
+    private val highscoreLabel: Label by fxid()
 
     init {
         main.gameEndView = this
+        root.applyBackgroundSettings()
     }
 
-    fun start(coinsCollected: Int) {
+    fun start(coinsCollected: Int, oldHighscore: Int) {
         if (!onMainThread()) {
             Platform.runLater {
-                start(coinsCollected)
+                start(coinsCollected, oldHighscore)
             }
             return
         }
         score.text = "Score: ${main.score}"
-        playAgainButton.setOnAction {
+        playAgainButton.setOnPress {
             replaceWith<GameView>()
-            main.gameView.startWithPaneParam(main.gameView.root)
+            main.gameManager.start()
         }
-        homeButton.setOnAction {
+        homeButton.setOnPress {
             replaceWith<StartView>()
         }
         coins.text = "Coins Collected: $coinsCollected"
+        highscoreLabel.text = if (main.profile.highscore == main.score) {
+            "NEW Highscore: ${main.score} (Old: $oldHighscore)"
+        } else {
+            "Highscore: ${main.profile.highscore}"
+        }
     }
 }

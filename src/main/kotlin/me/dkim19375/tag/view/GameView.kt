@@ -1,6 +1,5 @@
 package me.dkim19375.tag.view
 
-import javafx.application.Platform
 import javafx.geometry.Pos
 import javafx.scene.control.Label
 import javafx.scene.image.Image
@@ -12,60 +11,26 @@ import javafx.scene.paint.Color
 import javafx.scene.paint.ImagePattern
 import javafx.scene.shape.Circle
 import javafx.scene.text.Font
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import me.dkim19375.dkimcore.extension.SCOPE
-import me.dkim19375.tag.VIEW_TITLE
 import me.dkim19375.tag.main
-import me.dkim19375.tag.util.KeyType
-import me.dkim19375.tag.util.SkinType
-import me.dkim19375.tag.util.await
-import me.dkim19375.tag.util.centerX
-import me.dkim19375.tag.util.getAngle
-import me.dkim19375.tag.util.getDirectionPoint
-import me.dkim19375.tag.util.getLocation
-import me.dkim19375.tag.util.getPoint
-import me.dkim19375.tag.util.getX
-import me.dkim19375.tag.util.getY
-import me.dkim19375.tag.util.isTouching
-import me.dkim19375.tag.util.onMainThread
-import me.dkim19375.tag.util.setBounds
-import me.dkim19375.tag.util.teleport
-import me.dkim19375.tag.util.toKeyType
-import me.dkim19375.tag.util.windowX
-import me.dkim19375.tag.util.windowY
-import tornadofx.View
-import tornadofx.circle
-import tornadofx.hbox
-import tornadofx.hide
-import tornadofx.keyboard
-import tornadofx.label
-import tornadofx.pane
-import tornadofx.show
-import tornadofx.vbox
-import kotlin.math.min
-import kotlin.system.measureTimeMillis
-
-private const val TPS = 500.0
-private val tickDiff: Double
-    get() = 1000.0 / TPS
-private const val BASE_SPEED = 0.6
+import me.dkim19375.tag.manager.GameManager
+import me.dkim19375.tag.util.*
+import tornadofx.*
 
 @Suppress("MemberVisibilityCanBePrivate")
 class GameView : View(VIEW_TITLE) {
     override val root: Pane = pane {
         keyboard {
-            addEventHandler(KeyEvent.KEY_PRESSED) { event ->
-                pressed.add(event.text.toKeyType() ?: return@addEventHandler)
-            }
-            addEventHandler(KeyEvent.KEY_RELEASED) { event ->
-                pressed.remove(event.text.toKeyType() ?: return@addEventHandler)
-            }
+            addEventHandler(KeyEvent.KEY_PRESSED) { event -> main.gameManager.onKeyPressed(event.code) }
+            addEventHandler(KeyEvent.KEY_RELEASED) { event -> main.gameManager.onKeyReleased(event.code) }
         }
+        applyBackgroundSettings()
     }
+    private val gameManager: GameManager = main.gameManager
     lateinit var user: Circle
         private set
     lateinit var enemy: Circle
+        private set
+    lateinit var coin: Circle
         private set
     lateinit var topVBox: VBox
         private set
@@ -83,146 +48,52 @@ class GameView : View(VIEW_TITLE) {
         private set
     lateinit var coinsLabel: Label
         private set
-    var active = false
-    var latestTPS = TPS.toInt()
-    var gameStarted = false
-    var pressed = mutableSetOf<KeyType>()
-    var speed = BASE_SPEED * (500.0 / TPS)
-    var lives = 5
-    var coins = 0
-    var enemyFrozen = false
-    var lastHit = 0L
 
     init {
         main.gameView = this
     }
 
-    private fun reset() {
-        active = false
-        gameStarted = false
-        pressed = mutableSetOf()
-        speed = BASE_SPEED * (500.0 / TPS)
-        main.score = 0
-        lives = 5
-        coins = 0
-        enemyFrozen = false
+    fun reset() {
         if (this::gameOverLabel.isInitialized) {
             gameOverLabel.hide()
         }
     }
 
-    fun startWithPaneParam(pane: Pane) = pane.start()
+    fun updateLabels() = runSync {
+        scoreLabel.text = "Score: ${main.score}"
+        livesLabel.text = "Lives: ${gameManager.lives}"
+        tpsLabel.text = "TPS: ${gameManager.latestTPS}/${TPS.toInt()}"
+        coinsLabel.text = "Coins: ${gameManager.coins}"
+    }
 
-    fun Pane.start() {
-        if (!onMainThread()) {
-            Platform.runLater {
-                start()
-            }
-            return
+    fun setupUserBall() {
+        if (!this@GameView::user.isInitialized) {
+            user = root.circle(centerX = (-200).getX(), centerY = 0.getY(), radius = 50)
         }
-        reset()
-        setupUserBall()
-        setupEnemyBall()
-        setupVariables()
-        active = true
-        SCOPE.launch {
-            var first = true
-            while (true) {
-                if (!active) {
-                    return@launch
-                }
-                if (gameStarted && !first && !enemyFrozen) {
-                    speed += 0.05 * (500.0 / TPS)
-                    main.score++
-                }
-                Platform.runLater {
-                    scoreLabel.text = "Score: ${main.score}"
-                    livesLabel.text = "Lives: $lives"
-                    tpsLabel.text = "TPS: $latestTPS/${TPS.toInt()}"
-                    coinsLabel.text = "Coins: $coins"
-                }
-                first = false
-                delay(1000L)
-            }
-        }
-        SCOPE.launch {
-            delay(3000L)
-            gameStarted = true
-            while (true) {
-                if (!active) {
-                    return@launch
-                }
-                val off = measureTimeMillis {
-                    runSync {
-                        move()
-                        detectHit()
-                    }
-                }
-                if ((off > tickDiff) && ((off - tickDiff) / tickDiff >= 10.0)) {
-                    System.err.println("Running ${(off - tickDiff).toInt()}ms behind (${((off - tickDiff) / tickDiff).toInt()} ticks)!")
-                }
-                latestTPS = min((TPS.toInt() - ((off - tickDiff) / tickDiff).toInt()), TPS.toInt())
-                delay((tickDiff - off).toLong())
-            }
-        }
-        SCOPE.launch {
-            await { gameStarted }
-            while (true) {
-                if (!active) {
-                    return@launch
-                }
-                if (enemyFrozen) {
-                    delay(3000L)
-                    continue
-                }
-                coins++
-                Platform.runLater {
-                    coinsLabel.text = "Coins: $coins"
-                }
-                delay(3000L)
-            }
+        user.run {
+            fill = main.selectedSkin.image()
+            strokeWidth = 1.0
+            stroke = Color.BLACK
         }
     }
 
-    private fun Pane.setupUserBall() {
-        if (this@GameView::user.isInitialized) {
-            user.fill = if (main.selectedSkin == SkinType.DEFAULT) {
-                Color.BLACK
-            } else {
-                ImagePattern(Image(main.selectedSkin.imagePath))
-            }
-            user.teleport((-200).getX(), 0.getY())
-            user.strokeWidth = 1.0
-            user.stroke = Color.BLACK
-            return
+    fun setupEnemyBall() {
+        if (!this@GameView::enemy.isInitialized) {
+            enemy = root.circle(centerX = 200.getX(), centerY = 0.getY(), radius = 50)
         }
-        user = circle(centerX = (-200).getX(), centerY = 0.getY(), radius = 50)
-        user.fill = if (main.selectedSkin == SkinType.DEFAULT) {
-            Color.BLACK
-        } else {
-            ImagePattern(Image(main.selectedSkin.imagePath))
+        enemy.run {
+            fill = Color.RED
+            stroke = Color.BLACK
         }
-        user.strokeWidth = 1.0
-        user.stroke = Color.BLACK
     }
 
-    private fun Pane.setupVariables() {
-        var finished = false
+    fun setupLabels(finished: () -> Unit) = root.run {
         if (this@GameView::topHBox.isInitialized) {
             gameOverLabel.hide()
             return
         }
         topVBox = vbox {
             alignment = Pos.CENTER
-            SCOPE.launch {
-                await { finished }
-                while (true) {
-                    runSync {
-                        updateTopVBox()
-                    }
-                    delay(50L)
-                }
-            }
             tpsLabel = label("TPS: 0/0") {
                 font = Font.font("System", 50.0)
                 alignment = Pos.CENTER
@@ -236,102 +107,34 @@ class GameView : View(VIEW_TITLE) {
             font = Font.font("System", 70.0)
             alignment = Pos.CENTER
             hide()
-            SCOPE.launch {
-                await { finished }
-                while (true) {
-                    runSync {
-                        teleport(centerX - (width / 2), windowY - height - 100.0)
-                    }
-                    delay(50L)
-                }
-            }
         }
         scoreLabel = topHBox.label("Score: ${main.score}") { font = Font.font("System", 50.0) }
         topHBox.label("          ") { font = Font.font("System", 70.0) }
-        livesLabel = topHBox.label("Lives: $lives") { font = Font.font("System", 50.0) }
+        livesLabel = topHBox.label("Lives: ${gameManager.lives}") { font = Font.font("System", 50.0) }
         topHBox.label("          ") { font = Font.font("System", 70.0) }
         mainLabel = topVBox.label("Tag") { font = Font.font("System", 70.0) }
-        coinsLabel = topHBox.label("Coins: $coins") { font = Font.font("System", 50.0) }
-        finished = true
+        coinsLabel = topHBox.label("Coins: ${gameManager.coins}") { font = Font.font("System", 50.0) }
+        finished()
     }
 
-    private fun VBox.updateTopVBox() {
+    fun updateTopVBox() = topVBox.run {
         alignment = Pos.CENTER
         topHBox.alignment = Pos.CENTER
         teleport(centerX - (width / 2), height / 10)
     }
 
-    private fun Pane.setupEnemyBall() {
-        if (this@GameView::enemy.isInitialized) {
-            enemy.teleport(200.getX(), 0.getY())
-            return
+    fun setupCoin() = root.run {
+        if (!this@GameView::coin.isInitialized) {
+            coin = circle(radius = 40)
         }
-        enemy = circle(centerX = 200.getX(), centerY = 0.getY(), radius = 50) {
-            fill = Color.RED
+        coin.run {
+            fill = ImagePattern(Image("images/coin.png"))
             stroke = Color.BLACK
-        }
-    }
-
-    @Synchronized
-    private fun move() {
-        val loc = user.getPoint(pressed, speed).setBounds(
-            maxX = windowX - user.radius * 1.5,
-            maxY = windowY - user.radius * 1.5,
-            minX = -(user.radius * 0.5),
-            minY = -(user.radius * 0.5)
-        )
-        user.teleport(loc)
-        if (!enemyFrozen) {
-            val enemyLoc = enemy.getLocation()
-            enemy.teleport(enemyLoc.getDirectionPoint(speed * 0.8, enemyLoc.getAngle(user.getLocation())))
-        }
-    }
-
-    @Synchronized
-    private fun detectHit() {
-        if (enemyFrozen) {
-            return
-        }
-        if (!user.isTouching(enemy)) {
-            return
-        }
-        if (lives <= 1) {
-            stop()
-            return
-        }
-        if (System.currentTimeMillis() - lastHit <= 2500L) {
-            return
-        }
-        lastHit = System.currentTimeMillis()
-        lives--
-        Platform.runLater { livesLabel.text = "Lives: $lives" }
-        SCOPE.launch {
-            enemyFrozen = true
-            delay(3000L)
-            enemyFrozen = false
+            strokeWidth = 1.0
         }
     }
 
     fun stop() {
-        active = false
-        main.coins += coins
-        main.startView.updateCoinsLabel()
         gameOverLabel.show()
-        SCOPE.launch {
-            delay(3000L)
-            Platform.runLater {
-                replaceWith<GameEndView>()
-                main.gameEndView.start(coins)
-            }
-        }
-    }
-
-    @Synchronized
-    private fun runSync(action: () -> Unit) {
-        if (!onMainThread()) {
-            Platform.runLater(action)
-            return
-        }
-        action()
     }
 }

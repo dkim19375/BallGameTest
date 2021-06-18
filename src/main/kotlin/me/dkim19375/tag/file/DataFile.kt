@@ -51,9 +51,7 @@ class DataFile : YamlFile(DataFileSettings, "data/datafile.yml") {
         saved = false
     }
 
-    fun getProfile(
-        profile: String
-    ): Profile {
+    fun getProfile(profile: String): Profile {
         if (get(DataFileSettings.PROFILES).containsKey(profile)) {
             return get(DataFileSettings.PROFILES).getValue(profile).toProfile()
         }
@@ -61,6 +59,8 @@ class DataFile : YamlFile(DataFileSettings, "data/datafile.yml") {
         setProfile(new)
         return new
     }
+
+    fun profileExists(profile: String): Boolean = getProfiles().any { it.name == profile }
 
     fun setProfile(
         profile: Profile,

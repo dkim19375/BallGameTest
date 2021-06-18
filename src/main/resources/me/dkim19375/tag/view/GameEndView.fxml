@@ -6,6 +6,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<!--suppress ALL -->
 <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="546.0" prefWidth="865.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox alignment="CENTER" prefHeight="120.0" prefWidth="865.0">
@@ -51,6 +52,15 @@
                   <Font size="29.0" />
                </font>
             </Button>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" prefHeight="82.0" prefWidth="865.0">
+         <children>
+            <Label fx:id="highscoreLabel" alignment="CENTER" prefHeight="73.0" prefWidth="539.0" text="Highscore: 0" textAlignment="CENTER">
+               <font>
+                  <Font size="40.0" />
+               </font>
+            </Label>
          </children>
       </HBox>
    </children>
