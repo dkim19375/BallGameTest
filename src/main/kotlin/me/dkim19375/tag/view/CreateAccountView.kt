@@ -1,31 +1,50 @@
 package me.dkim19375.tag.view
 
+import com.jfoenix.controls.JFXButton
+import com.jfoenix.controls.JFXPasswordField
+import com.jfoenix.controls.JFXTextField
 import javafx.application.Platform
-import javafx.scene.control.Button
 import javafx.scene.control.Label
-import javafx.scene.control.PasswordField
-import javafx.scene.control.TextField
-import javafx.scene.layout.VBox
+import javafx.scene.control.TextInputControl
+import javafx.scene.layout.*
+import javafx.scene.paint.Color
+import javafx.scene.text.Font
+import kfoenix.jfxpasswordfield
+import kfoenix.jfxtextfield
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.dkim19375.dkimcore.extension.SCOPE
 import me.dkim19375.tag.file.Profile
 import me.dkim19375.tag.main
-import me.dkim19375.tag.util.VIEW_TITLE
-import me.dkim19375.tag.util.applyBackgroundSettings
-import me.dkim19375.tag.util.setOnPress
-import me.dkim19375.tag.util.toHash
-import tornadofx.View
-import tornadofx.hide
-import tornadofx.show
+import me.dkim19375.tag.util.*
+import tornadofx.*
 
 class CreateAccountView : View(VIEW_TITLE) {
     override val root: VBox by fxml()
-    private val usernameField: TextField by fxid()
-    private val passwordField: PasswordField by fxid()
-    private val createButton: Button by fxid()
-    private val backButton: Button by fxid()
+    private val usernameBox: HBox by fxid()
+    private val passwordBox: HBox by fxid()
+    private val createBox: HBox by fxid()
+    private val backBox: HBox by fxid()
+    private val applyRegion: Region.() -> Unit = {
+        val borderRadius = 5.0
+        background = Background(BackgroundFill(Color.BLACK, CornerRadii(borderRadius * 1.2), null))
+        val textColor = TEXT_COLOR
+        style = "-fx-text-fill: $TEXT_COLOR_HEX"
+        (this as? TextInputControl)?.font = Font.font("System", 15.0)
+        border = Border(
+            BorderStroke(
+                textColor,
+                BorderStrokeStyle.SOLID,
+                CornerRadii(borderRadius),
+                BorderWidths(5.0)
+            )
+        )
+    }
+    private val usernameField: JFXTextField = usernameBox.jfxtextfield { applyRegion() }
+    private val passwordField: JFXPasswordField = passwordBox.jfxpasswordfield { applyRegion() }
+    private val createButton: JFXButton = kfxButton("Create Profile", createBox, 50.0, 200.0)
+    private val backButton: JFXButton = kfxButton("Back", backBox, 50.0, 200.0)
     private val errorLabel: Label by fxid()
     private var job: Job? = null
 

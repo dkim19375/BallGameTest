@@ -11,7 +11,7 @@ enum class SkinType(
     val cost: Int,
     val image: () -> Paint = { ImagePattern(Image("images/skins/$intValue.png")) }
 ) {
-    DEFAULT(0, 0, { Color.BLACK }),
+    DEFAULT(0, 0, { Color.MEDIUMSEAGREEN }),
     ONE(1, 10),
     TWO(2, 30),
     THREE(3, 50),

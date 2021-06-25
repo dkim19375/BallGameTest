@@ -1,10 +1,11 @@
 package me.dkim19375.tag.abstract
 
+import com.jfoenix.controls.JFXButton
 import javafx.application.Platform
-import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.image.Image
 import javafx.scene.input.MouseButton
+import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.scene.paint.ImagePattern
@@ -30,9 +31,12 @@ abstract class SkinsViewAbstract : View(VIEW_TITLE) {
     protected abstract val circles: List<Circle>
     protected abstract val costs: List<Label>
     protected abstract val firstItem: Int
-    protected open val previousButton: Button? = null
-    protected open val nextButton: Button? = null
-    protected abstract val backButton: Button
+    protected open val previousBox: HBox? = null
+    protected open val nextBox: HBox? = null
+    protected abstract val backBox: HBox
+    protected open val previousButton: JFXButton? = null
+    protected open val nextButton: JFXButton? = null
+    protected abstract val backButton: JFXButton
     private val current = javaClass.simpleName[9].toString().toInt()
 
     init {
@@ -40,10 +44,10 @@ abstract class SkinsViewAbstract : View(VIEW_TITLE) {
             backButton.setOnPress {
                 replaceWith<StartView>()
             }
-            previousButton?.setOnAction {
+            previousButton?.setOnPress {
                 onChangeButton(-1)
             }
-            nextButton?.setOnAction {
+            nextButton?.setOnPress {
                 onChangeButton(1)
             }
             onStart()
@@ -54,12 +58,10 @@ abstract class SkinsViewAbstract : View(VIEW_TITLE) {
     private fun onChangeButton(change: Int) {
         replaceWith(
             Class.forName(
-                javaClass.name.replace(
-                    current.toString()[0],
-                    (current + change).toString()[0]
-                )
+                javaClass.name.removeSuffix(current.toString()) + (current + change).toString()
             ).kotlin as KClass<out UIComponent>
         )
+        (main.javaClass.getDeclaredField("skinsView${current + change}").get(main) as SkinsViewAbstract).start()
     }
 
     open fun start() {
@@ -74,7 +76,10 @@ abstract class SkinsViewAbstract : View(VIEW_TITLE) {
     }
 
     private fun setupItems() {
-        for (type in SkinType.values()) {
+        for (type in SkinType.values()
+            .filter { it.intValue >= firstItem }
+            .filter { it.intValue - firstItem < circles.size }
+        ) {
             val circle = circles[type.intValue - firstItem]
             setupItem(circle, type)
         }
@@ -89,7 +94,7 @@ abstract class SkinsViewAbstract : View(VIEW_TITLE) {
             circle.fill = ImagePattern(Image("images/${if (type == SkinType.CUSTOM) "custom_" else ""}lock.png"))
         }
         costs[number].text = if (isDefault) "Free!" else "Cost: $cost Coins"
-        costs[number].textFill = if (cost > main.coins) Color.RED else Color.DARKGREEN
+        costs[number].textFill = if (cost > main.coins) Color.RED else Color.LIME
         if (!setup.contains(number)) {
             setup.add(number)
             circle.setOnMouseClicked { event ->

@@ -72,8 +72,8 @@ class GameView : View(VIEW_TITLE) {
         }
         user.run {
             fill = main.selectedSkin.image()
-            strokeWidth = 1.0
-            stroke = Color.BLACK
+            stroke = Color.rgb(32, 50, 205)
+            strokeWidth = 4.0
         }
     }
 
@@ -82,8 +82,9 @@ class GameView : View(VIEW_TITLE) {
             enemy = root.circle(centerX = 200.getX(), centerY = 0.getY(), radius = 50)
         }
         enemy.run {
-            fill = Color.RED
-            stroke = Color.BLACK
+            fill = Color.rgb(200, 0, 0)
+            stroke = Color.rgb(32, 50, 205)
+            strokeWidth = 4.0
         }
     }
 
@@ -95,6 +96,7 @@ class GameView : View(VIEW_TITLE) {
         topVBox = vbox {
             alignment = Pos.CENTER
             tpsLabel = label("TPS: 0/0") {
+                textFill = Color.web("#80b0ff")
                 font = Font.font("System", 50.0)
                 alignment = Pos.CENTER
             }
@@ -105,15 +107,32 @@ class GameView : View(VIEW_TITLE) {
         }
         gameOverLabel = label("Game Over!") {
             font = Font.font("System", 70.0)
+            textFill = Color.web("#80b0ff")
             alignment = Pos.CENTER
             hide()
         }
-        scoreLabel = topHBox.label("Score: ${main.score}") { font = Font.font("System", 50.0) }
-        topHBox.label("          ") { font = Font.font("System", 70.0) }
-        livesLabel = topHBox.label("Lives: ${gameManager.lives}") { font = Font.font("System", 50.0) }
-        topHBox.label("          ") { font = Font.font("System", 70.0) }
-        mainLabel = topVBox.label("Tag") { font = Font.font("System", 70.0) }
-        coinsLabel = topHBox.label("Coins: ${gameManager.coins}") { font = Font.font("System", 50.0) }
+        scoreLabel = topHBox.label("Score: ${main.score}") {
+            font = Font.font("System", 50.0)
+            textFill = Color.web("#80b0ff")
+        }
+        topHBox.label("          ") {
+            font = Font.font("System", 70.0)
+        }
+        livesLabel = topHBox.label("Lives: ${gameManager.lives}") {
+            font = Font.font("System", 50.0)
+            textFill = Color.web("#80b0ff")
+        }
+        topHBox.label("          ") {
+            font = Font.font("System", 70.0)
+        }
+        mainLabel = topVBox.label("Tag") {
+            font = Font.font("System", 70.0)
+            textFill = Color.web("#80b0ff")
+        }
+        coinsLabel = topHBox.label("Coins: ${gameManager.coins}") {
+            font = Font.font("System", 50.0)
+            textFill = Color.web("#80b0ff")
+        }
         finished()
     }
 

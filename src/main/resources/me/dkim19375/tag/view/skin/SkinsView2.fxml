@@ -28,14 +28,34 @@
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="350.0" />
          </columnConstraints>
          <rowConstraints>
-            <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="150.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="150.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="150.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Circle fx:id="image4" fill="DODGERBLUE" radius="53.0" stroke="BLACK" strokeType="INSIDE" />
+                  <Label fx:id="costLabel4" text="Cost: 10 Coins">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" GridPane.columnIndex="1">
+               <children>
+                  <Circle fx:id="image5" fill="DODGERBLUE" radius="53.0" stroke="BLACK" strokeType="INSIDE" />
+                  <Label fx:id="costLabel5" text="Cost: 10 Coins">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="1">
                <children>
-                  <Circle fx:id="image2" fill="DODGERBLUE" radius="53.0" stroke="BLACK" strokeType="INSIDE" />
-                  <Label fx:id="costLabel2" text="Cost: 10 Coins">
+                  <Circle fx:id="image6" fill="DODGERBLUE" radius="53.0" stroke="BLACK" strokeType="INSIDE" />
+                  <Label fx:id="costLabel6" text="Cost: 10 Coins">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
@@ -44,28 +64,8 @@
             </VBox>
             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <children>
-                  <Circle fx:id="image3" fill="DODGERBLUE" radius="53.0" stroke="BLACK" strokeType="INSIDE" />
-                  <Label fx:id="costLabel3" text="Cost: 10 Coins">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                  </Label>
-               </children>
-            </VBox>
-            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-               <children>
-                  <Circle fx:id="image0" radius="53.0" stroke="BLACK" strokeType="INSIDE" />
-                  <Label fx:id="costLabel0" text="Free!">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                  </Label>
-               </children>
-            </VBox>
-            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1">
-               <children>
-                  <Circle fx:id="image1" fill="DODGERBLUE" radius="53.0" stroke="BLACK" strokeType="INSIDE" />
-                  <Label fx:id="costLabel1" text="Cost: 10 Coins">
+                  <Circle fx:id="customImage" fill="DODGERBLUE" radius="53.0" stroke="BLACK" strokeType="INSIDE" />
+                  <Label fx:id="customCostLabel" text="Cost: 10 Coins">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
@@ -83,7 +83,8 @@
             </Label>
          </children>
       </HBox>
-      <HBox fx:id="nextBox" alignment="CENTER" prefHeight="75.0" prefWidth="1030.0" />
+      <HBox fx:id="uploadHBox" alignment="CENTER" prefHeight="75.0" prefWidth="1030.0" />
+      <HBox fx:id="previousBox" alignment="CENTER" prefHeight="75.0" prefWidth="1030.0" />
       <HBox fx:id="backBox" alignment="CENTER" prefHeight="75.0" prefWidth="1030.0" />
    </children>
 </VBox>

@@ -1,33 +1,86 @@
 package me.dkim19375.tag.view
 
+import com.jfoenix.controls.JFXButton
+import com.jfoenix.controls.JFXListCell
+import com.jfoenix.controls.JFXListView
+import com.jfoenix.controls.JFXPasswordField
 import javafx.application.Platform
-import javafx.scene.control.Button
 import javafx.scene.control.Label
+import javafx.scene.control.ListCell
 import javafx.scene.control.ListView
-import javafx.scene.control.PasswordField
-import javafx.scene.layout.VBox
+import javafx.scene.layout.*
+import javafx.scene.paint.Color
+import javafx.scene.text.Font
+import javafx.scene.text.FontWeight
+import javafx.util.Callback
+import kfoenix.jfxlistview
+import kfoenix.jfxpasswordfield
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.dkim19375.dkimcore.extension.SCOPE
 import me.dkim19375.tag.file.Profile
 import me.dkim19375.tag.main
-import me.dkim19375.tag.util.VIEW_TITLE
-import me.dkim19375.tag.util.applyBackgroundSettings
-import me.dkim19375.tag.util.setOnPress
-import tornadofx.View
-import tornadofx.hide
-import tornadofx.observableListOf
-import tornadofx.show
+import me.dkim19375.tag.util.*
+import tornadofx.*
 
 class ProfileView : View(VIEW_TITLE) {
     override val root: VBox by fxml()
-    private val profileList: ListView<String> by fxid()
-    private val passwordField: PasswordField by fxid()
-    private val backButton: Button by fxid()
-    private val selectButton: Button by fxid()
-    private val createButton: Button by fxid()
-    private val deleteButton: Button by fxid()
+    private val profileBox: HBox by fxid()
+    @Suppress("UNCHECKED_CAST")
+    private val profiles: JFXListView<String> = profileBox.jfxlistview {
+        prefWidth = 400.0
+        prefHeight = Region.USE_COMPUTED_SIZE
+        val borderRadius = 15.0
+        val textColor = TEXT_COLOR
+        border =
+            Border(BorderStroke(textColor, BorderStrokeStyle.SOLID, CornerRadii(borderRadius), BorderWidths(3.0)))
+        background = Background(BackgroundFill(textColor, CornerRadii(borderRadius * 1.2), null))
+        cellFactory = Callback<JFXListView<String>, JFXListCell<String>> callback@{
+            object : JFXListCell<String>() {
+                override fun updateItem(item: String?, empty: Boolean) {
+                    super.updateItem(item, empty)
+                    cellRippler.ripplerFill = Color.web("#232c70")
+                    border = Border(
+                        BorderStroke(
+                            textColor,
+                            BorderStrokeStyle.SOLID,
+                            CornerRadii.EMPTY,
+                            BorderWidths(3.0),
+                        ),
+                    )
+                    textFill = textColor
+                    text = if (item == null || empty) null else item
+                    font = Font.font("System", FontWeight.BOLD, 15.0)
+                    style = "-fx-control-inner-background: BLACK; " +
+                            "-fx-text-fill: $TEXT_COLOR_HEX; " +
+                            "-fx-accent: #0f185c; " +
+                            "-fx-focus-color: #0f185c;" +
+                            "-fx-cell-hover-color: #0f185c;"
+                }
+            }
+        } as Callback<ListView<String>, ListCell<String>>
+    }
+    private val passwordBox: HBox by fxid()
+    @Suppress("UsePropertyAccessSyntax")
+    private val passwordField: JFXPasswordField = passwordBox.jfxpasswordfield {
+        val borderRadius = 5.0
+        background = Background(BackgroundFill(Color.BLACK, CornerRadii(borderRadius * 1.2), null))
+        val textColor = TEXT_COLOR
+        border =
+            Border(BorderStroke(textColor, BorderStrokeStyle.SOLID, CornerRadii(borderRadius), BorderWidths(5.0)))
+        this.prefHeight = 25.0
+        this.prefWidth = 250.0
+        setStyle("-fx-text: $TEXT_COLOR_HEX;")
+    }
+    private val backBox: HBox by fxid()
+    private val selectBox: HBox by fxid()
+    private val createBox: HBox by fxid()
+    private val deleteBox: HBox by fxid()
+    private val backButton: JFXButton = kfxButton("Back", backBox, 50.0, 200.0)
+    private val selectButton: JFXButton = kfxButton("Select", selectBox, 50.0, 200.0)
+    private val createButton: JFXButton = kfxButton("Create Profile", createBox, 50.0, 200.0)
+    private val deleteButton: JFXButton = kfxButton("Delete profile", deleteBox, 50.0, 200.0)
     private val errorLabel: Label by fxid()
     private var job: Job? = null
 
@@ -35,7 +88,7 @@ class ProfileView : View(VIEW_TITLE) {
         main.profileView = this
         root.applyBackgroundSettings()
         selectButton.setOnPress {
-            val selected = profileList.selectionModel.selectedItem ?: run {
+            val selected = profiles.selectionModel.selectedItem ?: run {
                 showError("You must select a profile!")
                 return@setOnPress
             }
@@ -47,20 +100,14 @@ class ProfileView : View(VIEW_TITLE) {
             }
             main.dataFile.setCurrentProfile(selected)
             replaceWith<StartView>()
-            main.startView.updateCoinsLabel()
-            main.startView.updateHighscoreLabel()
-            main.startView.updateSelectedCircle()
-            main.startView.updateProfileButton()
+            main.startView.update()
         }
         backButton.setOnPress {
             replaceWith<StartView>()
-            main.startView.updateCoinsLabel()
-            main.startView.updateHighscoreLabel()
-            main.startView.updateSelectedCircle()
-            main.startView.updateProfileButton()
+            main.startView.update()
         }
         deleteButton.setOnPress {
-            val selected = profileList.selectionModel.selectedItem ?: run {
+            val selected = profiles.selectionModel.selectedItem ?: run {
                 showError("You must select a profile!")
                 return@setOnPress
             }
@@ -94,7 +141,7 @@ class ProfileView : View(VIEW_TITLE) {
     }
 
     fun updateProfileList() {
-        profileList.items = observableListOf(main.dataFile.getProfiles().map(Profile::name))
+        profiles.items = observableListOf(main.dataFile.getProfiles().map(Profile::name))
     }
 
     private fun showError(text: String) {

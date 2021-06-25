@@ -14,8 +14,7 @@ import me.dkim19375.tag.enumclass.toKeyType
 import me.dkim19375.tag.util.*
 import me.dkim19375.tag.view.GameEndView
 import me.dkim19375.tag.view.GameView
-import tornadofx.hide
-import tornadofx.show
+import tornadofx.*
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
@@ -23,23 +22,23 @@ import kotlin.random.nextInt
 import kotlin.system.measureTimeMillis
 
 class GameManager(private val main: TagGame) {
-    var active = false
-    var latestTPS = TPS.toInt()
-    var gameStarted = false
-    val pressed = mutableSetOf<KeyType>()
-    var speed = BASE_SPEED * (500.0 / TPS)
     var lives = 5
     var coins = 0
-    var enemyFrozen = false
-    var lastHit = 0L
-    val gameView: GameView
-        get() = main.gameView
-    val user: Circle
-        get() = gameView.user
-    val enemy: Circle
-        get() = gameView.enemy
-    val coin: Circle
+    var latestTPS = TPS.toInt()
+    private var lastHit = 0L
+    private var active = false
+    private var gameStarted = false
+    private var enemyFrozen = false
+    private val pressed = mutableSetOf<KeyType>()
+    private var speed = BASE_SPEED * (500.0 / TPS)
+    private val coin: Circle
         get() = gameView.coin
+    private val user: Circle
+        get() = gameView.user
+    private val enemy: Circle
+        get() = gameView.enemy
+    private val gameView: GameView
+        get() = main.gameView
 
     private fun reset() {
         active = false
