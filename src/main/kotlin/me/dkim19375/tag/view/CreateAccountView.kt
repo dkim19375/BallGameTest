@@ -29,12 +29,11 @@ class CreateAccountView : View(VIEW_TITLE) {
     private val applyRegion: Region.() -> Unit = {
         val borderRadius = 5.0
         background = Background(BackgroundFill(Color.BLACK, CornerRadii(borderRadius * 1.2), null))
-        val textColor = TEXT_COLOR
         style = "-fx-text-fill: $TEXT_COLOR_HEX"
         (this as? TextInputControl)?.font = Font.font("System", 15.0)
         border = Border(
             BorderStroke(
-                textColor,
+                BORDER_COLOR,
                 BorderStrokeStyle.SOLID,
                 CornerRadii(borderRadius),
                 BorderWidths(5.0)

@@ -30,12 +30,12 @@
                         <Font size="25.0" />
                      </font>
                   </Label>
-                  <Circle fx:id="skinCircle" fill="DODGERBLUE" radius="36.0" stroke="BLACK" strokeType="INSIDE" />
+                  <Circle fx:id="skinCircle" fill="DODGERBLUE" radius="45.0" stroke="BLACK" strokeType="INSIDE" />
                </children>
             </VBox>
          </children>
       </HBox>
-      <HBox alignment="BOTTOM_CENTER" prefHeight="104.0" prefWidth="958.0">
+      <HBox alignment="BOTTOM_CENTER" prefHeight="77.0" prefWidth="958.0">
          <children>
             <Label fx:id="coinsLabel" alignment="TOP_RIGHT" prefHeight="54.0" text="Coins: 0" textFill="#80b0ff">
                <font>

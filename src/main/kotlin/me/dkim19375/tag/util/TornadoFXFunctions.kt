@@ -93,10 +93,13 @@ fun EventTarget.kfxButton(
 ) = parent.jfxbutton(name, JFXButton.ButtonType.RAISED) button@{
     val borderRadius = 15.0
     background = Background(BackgroundFill(Color.BLACK, CornerRadii(borderRadius * 1.2), null))
-    val textColor = TEXT_COLOR
-    textFill = textColor
+    textFill = TEXT_COLOR
     border =
-        Border(BorderStroke(textColor, BorderStrokeStyle.SOLID, CornerRadii(borderRadius), BorderWidths(5.0)))
+        Border(
+            BorderStroke(
+                BORDER_COLOR, BorderStrokeStyle.SOLID, CornerRadii(borderRadius), BorderWidths(5.0)
+            )
+        )
     this.prefHeight = height
     this.prefWidth = width
     font = Font.font(font.family, fontType, 24.0)

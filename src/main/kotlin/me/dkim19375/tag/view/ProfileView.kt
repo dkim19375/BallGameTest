@@ -32,10 +32,9 @@ class ProfileView : View(VIEW_TITLE) {
         prefWidth = 400.0
         prefHeight = Region.USE_COMPUTED_SIZE
         val borderRadius = 15.0
-        val textColor = TEXT_COLOR
         border =
-            Border(BorderStroke(textColor, BorderStrokeStyle.SOLID, CornerRadii(borderRadius), BorderWidths(3.0)))
-        background = Background(BackgroundFill(textColor, CornerRadii(borderRadius * 1.2), null))
+            Border(BorderStroke(BORDER_COLOR, BorderStrokeStyle.SOLID, CornerRadii(borderRadius), BorderWidths(3.0)))
+        background = Background(BackgroundFill(BORDER_COLOR, CornerRadii(borderRadius * 1.2), null))
         cellFactory = Callback<JFXListView<String>, JFXListCell<String>> callback@{
             object : JFXListCell<String>() {
                 override fun updateItem(item: String?, empty: Boolean) {
@@ -43,13 +42,13 @@ class ProfileView : View(VIEW_TITLE) {
                     cellRippler.ripplerFill = Color.web("#232c70")
                     border = Border(
                         BorderStroke(
-                            textColor,
+                            BORDER_COLOR,
                             BorderStrokeStyle.SOLID,
                             CornerRadii.EMPTY,
                             BorderWidths(3.0),
                         ),
                     )
-                    textFill = textColor
+                    textFill = TEXT_COLOR
                     text = if (item == null || empty) null else item
                     font = Font.font("System", FontWeight.BOLD, 15.0)
                     style = "-fx-control-inner-background: BLACK; " +
@@ -57,6 +56,9 @@ class ProfileView : View(VIEW_TITLE) {
                             "-fx-accent: #0f185c; " +
                             "-fx-focus-color: #0f185c;" +
                             "-fx-cell-hover-color: #0f185c;"
+                    if (item == this@jfxlistview.selectionModel.selectedItem && item != null) {
+                        style += "-fx-background-color: #0f185c"
+                    }
                 }
             }
         } as Callback<ListView<String>, ListCell<String>>
@@ -66,12 +68,11 @@ class ProfileView : View(VIEW_TITLE) {
     private val passwordField: JFXPasswordField = passwordBox.jfxpasswordfield {
         val borderRadius = 5.0
         background = Background(BackgroundFill(Color.BLACK, CornerRadii(borderRadius * 1.2), null))
-        val textColor = TEXT_COLOR
         border =
-            Border(BorderStroke(textColor, BorderStrokeStyle.SOLID, CornerRadii(borderRadius), BorderWidths(5.0)))
+            Border(BorderStroke(BORDER_COLOR, BorderStrokeStyle.SOLID, CornerRadii(borderRadius), BorderWidths(5.0)))
         this.prefHeight = 25.0
         this.prefWidth = 250.0
-        setStyle("-fx-text: $TEXT_COLOR_HEX;")
+        setStyle("-fx-text-inner-color: $TEXT_COLOR_HEX;")
     }
     private val backBox: HBox by fxid()
     private val selectBox: HBox by fxid()
@@ -138,6 +139,7 @@ class ProfileView : View(VIEW_TITLE) {
         errorLabel.hide()
         passwordField.text = ""
         updateProfileList()
+        profiles.selectionModel.select(main.profile.name)
     }
 
     fun updateProfileList() {
