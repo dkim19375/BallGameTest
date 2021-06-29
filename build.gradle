@@ -4,7 +4,8 @@ plugins {
     id 'org.openjfx.javafxplugin' version '0.0.10'
     id 'org.jetbrains.kotlin.jvm' version '1.5.10'
     id 'com.github.johnrengelman.shadow' version '6.1.0'
-    id 'org.mikeneck.graalvm-native-image' version 'v1.4.1'
+    id 'org.mikeneck.graalvm-native-image' version 'v1.4.0'
+    // id 'com.palantir.graal' version '0.9.0'
 }
 
 mainClassName = 'me.dkim19375.tag.TagGameKt'
@@ -16,35 +17,27 @@ compileJava.options.encoding = 'UTF-8'
 
 compileKotlin {
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "1.8"
     }
 }
 
 application {
     mainClass.set(mainClassName)
     applicationDefaultJvmArgs = [
-            "--add-exports=javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED",
-            "--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior" +
-                    "=ALL-UNNAMED",
-            "--add-exports=javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED",
-            "--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior" +
-                    "=com.jfoenix",
-            "--add-exports=javafx.controls/com.sun.javafx.binding=com.jfoenix",
-            "--illegal-access=warn",
-            "--add-opens=javafx.controls/javafx.scene.control.skin=com.jfoenix",
-            "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
-            "--add-opens=java.base/java.lang.reflect=com.jfoenix",
-            "--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior" +
-                    "=com.jfoenix",
-            "--add-exports=javafx.controls/com.sun.javafx.scene.control=com.jfoenix",
-            "--add-exports=javafx.base/com.sun.javafx.binding=com.jfoenix",
-            "--add-exports=javafx.graphics/com.sun.javafx.stage=com.jfoenix",
-            "--add-exports=javafx.base/com.sun.javafx.event=com.jfoenix"
+            '--illegal-access=warn',
+            '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED',
+            '--add-exports=javafx.base/com.sun.javafx.event=ALL-UNNAMED',
+            '--add-exports=javafx.base/com.sun.javafx.binding=ALL-UNNAMED',
+            '--add-exports=javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED',
+            '--add-exports=javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED',
+            '--add-opens=javafx.controls/javafx.scene.control.skin=ALL-UNNAMED',
+            '--add-exports=javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED',
+            '--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=ALL-UNNAMED',
     ]
 }
 
 javafx {
-    version = '12'
+    version = '15.0.1'
     modules = ['javafx.base', 'javafx.controls', 'javafx.graphics', 'javafx.fxml', 'javafx.media']
 }
 
@@ -62,23 +55,44 @@ repositories {
 dependencies {
     implementation 'no.tornado:tornadofx:1.7.20'
     implementation 'commons-io:commons-io:2.8.0'
-    implementation 'io.github.dkim19375:dkimcore:+'
+    implementation 'io.github.dkim19375:dkimcore:1.1.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
     implementation('com.github.bkenn:kfoenix:0.1.3') {
         exclude group: 'com.jfoenix', module: 'jfoenix'
     }
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
+    implementation 'com.google.code.gson:gson:2.8.7'
     implementation 'com.ToxicBakery.library.bcrypt:bcrypt:+'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
 }
 
+/*graal {
+    javaVersion 11
+}*/
+
 nativeImage {
-    graalVmHome = System.getProperty 'java.home'
+    graalVmHome = System.getenv 'GRAALVM_HOME'
+    classpath = shadowJar
     mainClass = mainClassName
     executableName = 'TagEXE'
     outputDirectory = file "$buildDir/libs/exe"
+    //noinspection UnnecessaryQualifiedReference
+    buildType { org.mikeneck.graalvm.BuildTypeSelector build ->
+        //noinspection GroovyAssignabilityCheck
+        build.executable {
+            //noinspection GroovyAssignabilityCheck
+            main = mainClassName
+        }
+    }
+    arguments {
+        add '--allow-incomplete-classpath'
+        add '--enable-url-protocols=css'
+        add '-H:EnableURLProtocols=css'
+        add '-H:+ReportExceptionStackTraces'
+    }
 }
+
 generateNativeImageConfig {
     enabled = true
 }

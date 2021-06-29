@@ -2,19 +2,27 @@ package me.dkim19375.tag.file
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import me.dkim19375.dkimcore.extension.SCOPE
-import me.dkim19375.dkimcore.file.YamlFile
-import me.dkim19375.tag.util.await
+import me.dkim19375.dkimcore.extension.IO_SCOPE
+import me.dkim19375.dkimcore.file.JsonFile
 
-class DataFile : YamlFile(DataFileSettings, "data/datafile.yml") {
+@Suppress("MemberVisibilityCanBePrivate")
+class DataFile : JsonFile<DataFileData>(DataFileData::class, "data/datafile.json") {
     private var saved = true
+
+    private val currentProfileName: String
+        get() = get().profile
+
+    private val profileMap: Map<String, ProfileConfigData>
+        get() = get().profiles
 
     init {
         reload()
         getProfile("Public") // check it exists
-        SCOPE.launch {
+        IO_SCOPE.launch {
             while (true) {
-                await { !saved }
+                if (saved) {
+                    continue
+                }
                 saved = true
                 save()
                 delay(1000L)
@@ -23,7 +31,7 @@ class DataFile : YamlFile(DataFileSettings, "data/datafile.yml") {
     }
 
     fun getProfiles(): List<Profile> {
-        val profiles = get(DataFileSettings.PROFILES).values.toMutableList()
+        val profiles = profileMap.values.toMutableList()
         if (profiles.none { it.name == "Public" }) {
             val profile = Profile("Public")
             setProfile(profile)
@@ -32,7 +40,7 @@ class DataFile : YamlFile(DataFileSettings, "data/datafile.yml") {
         return profiles.map(ProfileConfigData::toProfile)
     }
 
-    fun getProfileName(): String = get(DataFileSettings.PROFILE)
+    fun getProfileName(): String = currentProfileName
 
     fun getCurrentProfile(skipPassProtected: Boolean = false): Profile {
         val profile = getProfile(getProfileName())
@@ -47,42 +55,43 @@ class DataFile : YamlFile(DataFileSettings, "data/datafile.yml") {
         if (getProfileName() == profile) {
             return
         }
-        set(DataFileSettings.PROFILE, profile)
+        set(get().copy(profile = profile))
         saved = false
     }
 
     fun getProfile(profile: String): Profile {
-        if (get(DataFileSettings.PROFILES).containsKey(profile)) {
-            return get(DataFileSettings.PROFILES).getValue(profile).toProfile()
+        if (profileMap.containsKey(profile)) {
+            return profileMap.getValue(profile).toProfile()
         }
         val new = Profile(profile)
         setProfile(new)
         return new
     }
 
+    @Suppress("unused")
     fun profileExists(profile: String): Boolean = getProfiles().any { it.name == profile }
 
     fun setProfile(
         profile: Profile,
     ) {
-        if (get(DataFileSettings.PROFILES).containsKey(profile.name)) {
-            if (get(DataFileSettings.PROFILES)[profile.name]?.toProfile() == profile) {
+        if (profileMap.containsKey(profile.name)) {
+            if (profileMap[profile.name]?.toProfile() == profile) {
                 return
             }
         }
-        val new = get(DataFileSettings.PROFILES).toMutableMap()
+        val new = profileMap.toMutableMap()
         new[profile.name] = profile.toConfigData()
-        set(DataFileSettings.PROFILES, new)
+        set(get().copy(profiles = new))
         saved = false
     }
 
     fun deleteProfile(profile: String) {
-        if (!get(DataFileSettings.PROFILES).containsKey(profile)) {
+        if (!profileMap.containsKey(profile)) {
             return
         }
-        val map = get(DataFileSettings.PROFILES).toMutableMap()
+        val map = profileMap.toMutableMap()
         map.remove(profile)
-        set(DataFileSettings.PROFILES, map)
+        set(get().copy(profiles = map))
         saved = false
     }
 }
