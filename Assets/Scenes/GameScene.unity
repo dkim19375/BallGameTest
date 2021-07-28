@@ -901,7 +901,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1422477655}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
@@ -1446,11 +1446,11 @@ EdgeCollider2D:
   m_Offset: {x: 0, y: 0}
   m_EdgeRadius: 0.02
   m_Points:
-  - {x: -463, y: 260.46}
-  - {x: -463, y: -260.46}
-  - {x: 463, y: -260.46}
-  - {x: 463, y: 260.46}
-  - {x: -463, y: 260.46}
+  - {x: -533.5, y: 300}
+  - {x: -533.5, y: -300}
+  - {x: 533.5, y: -300}
+  - {x: 533.5, y: 300}
+  - {x: -533.5, y: 300}
   m_AdjacentStartPoint: {x: 0, y: 0}
   m_AdjacentEndPoint: {x: 0, y: 0}
   m_UseAdjacentStartPoint: 0
