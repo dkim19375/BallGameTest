@@ -97,7 +97,7 @@ namespace TMPro.Examples
             {
                 if (BenchmarkType == 0)
                 {
-                    m_textMeshPro.text = label01 + (i % 1000);
+                    m_textMeshPro.text = label01 + i % 1000;
                     if (i % 1000 == 999)
                         m_textMeshPro.fontSharedMaterial = m_textMeshPro.fontSharedMaterial == m_material01 ? m_textMeshPro.fontSharedMaterial = m_material02 : m_textMeshPro.fontSharedMaterial = m_material01;
 
