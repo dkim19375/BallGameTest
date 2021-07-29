@@ -712,9 +712,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1657174781}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab0cf81fe271a0b4ba0f06759154bd28, type: 3}
+  m_Script: {fileID: 11500000, guid: 1fa30b7962c38db44b02106a872e11d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scene: MainMenuScene
 --- !u!82 &1657174784
 AudioSource:
   m_ObjectHideFlags: 0
@@ -856,7 +857,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1657174783}
-        m_TargetAssemblyTypeName: GameOverScene.MainMenuGameOver, Assembly-CSharp
+        m_TargetAssemblyTypeName: ChangeScene, Assembly-CSharp
         m_MethodName: OnClick
         m_Mode: 1
         m_Arguments:
