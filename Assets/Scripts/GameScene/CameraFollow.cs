@@ -4,7 +4,7 @@ namespace GameScene {
     public class CameraFollow : MonoBehaviour {
         public Transform target;
 
-        private void FixedUpdate() {
+        private void Update() {
             Follow();
         }
 
