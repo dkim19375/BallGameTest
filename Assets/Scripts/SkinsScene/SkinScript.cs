@@ -24,18 +24,17 @@ namespace SkinsScene {
 
         private void Update() {
             GameManager.GetInstance().DataFileManager.CurrentData.CheckData();
-            _skinType.Image(_image);
-            var coins = GameManager.GetInstance().DataFileManager.CurrentData.GetCoins();
-            if (_skinType.Price <= 0) {
-                text.text = "Cost: Free!";
-            } else {
-                text.text = $"Cost: {_skinType.Price} Coins";
-            }
-            if (coins >= _skinType.Price) {
+            if (DataManager.CurrentData.GetBoughtSkins().Contains(_skinType)) {
+                _skinType.Image(_image);
+                text.text = "Owned!";
                 text.color = Color.green;
                 return;
             }
-            text.color = Color.red;
+            var path = $"Images/{(_skinType == SkinType.CustomSkin ? "Custom" : "")}Lock";
+            _image.texture = Utilities.RoundCrop(Resources.Load<Texture2D>(path));
+            var coins = GameManager.GetInstance().DataFileManager.CurrentData.GetCoins();
+            text.text = _skinType.Price <= 0 ? "Cost: Free!" : $"Cost: {_skinType.Price} Coins";
+            text.color = coins >= _skinType.Price ? Color.green : Color.red;
         }
 
         // ReSharper disable once UnusedMember.Global

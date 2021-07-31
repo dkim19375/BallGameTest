@@ -62,13 +62,15 @@ public class SkinType {
     );
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public static SkinType GetFromName(string name) => name.ToLower() switch {
-        "1" => One,
-        "2" => Two,
-        "3" => Three,
-        "4" => Four,
-        "5" => Five,
-        "6" => Six,
-        _ => Values[name.ToLower()]
-    };
+    public static SkinType GetFromName(string name) {
+        return name.ToLower() switch {
+            "1" => One,
+            "2" => Two,
+            "3" => Three,
+            "4" => Four,
+            "5" => Five,
+            "6" => Six,
+            _ => Values[name.ToLower()]
+        };
+    }
 }
